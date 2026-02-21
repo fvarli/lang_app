@@ -1,4 +1,5 @@
 {
+  "schemaVersion": 1,
   "levels": ["a1", "a2", "b1", "b2", "c1", "c2"],
   "modules": [
     {
@@ -50,14 +51,14 @@
       "passageText": "Sign: Open 08:00-18:00. Closed Sunday.",
       "questions": [
         {
-          "id": "q1",
+          "id": "r1_q1",
           "type": "mcq",
           "prompt": "When is the cafe closed?",
           "options": ["Sunday", "Monday", "Friday", "Saturday"],
           "correctIndex": 0
         },
         {
-          "id": "q2",
+          "id": "r1_q2",
           "type": "true_false",
           "prompt": "The cafe is open at 17:30.",
           "options": ["True", "False"],
@@ -74,18 +75,90 @@
       "passageText": "Notice: Please be quiet. No food or drinks inside.",
       "questions": [
         {
-          "id": "q1",
+          "id": "r2_q1",
           "type": "mcq",
           "prompt": "What is not allowed?",
           "options": ["Reading", "Food and drinks", "Silence", "Books"],
           "correctIndex": 1
         },
         {
-          "id": "q2",
+          "id": "r2_q2",
           "type": "true_false",
           "prompt": "You should be loud in the library.",
           "options": ["True", "False"],
           "correctIndex": 1
+        }
+      ]
+    },
+    {
+      "id": "reading_a1_bus_3",
+      "unitId": "unit_reading_a1_basics",
+      "module": "reading",
+      "level": "a1",
+      "title": "Bus Timetable",
+      "passageText": "Bus 12: 07:30, 08:00, 08:30. Last bus: 22:00.",
+      "questions": [
+        {
+          "id": "r3_q1",
+          "type": "mcq",
+          "prompt": "When is the second morning bus?",
+          "options": ["07:30", "08:00", "08:30", "09:00"],
+          "correctIndex": 1
+        },
+        {
+          "id": "r3_q2",
+          "type": "true_false",
+          "prompt": "The last bus is at 22:00.",
+          "options": ["True", "False"],
+          "correctIndex": 0
+        }
+      ]
+    },
+    {
+      "id": "reading_a1_store_4",
+      "unitId": "unit_reading_a1_basics",
+      "module": "reading",
+      "level": "a1",
+      "title": "Store Promotion",
+      "passageText": "Buy 1 get 1 free on apples. Offer ends Friday.",
+      "questions": [
+        {
+          "id": "r4_q1",
+          "type": "mcq",
+          "prompt": "What is on offer?",
+          "options": ["Bananas", "Apples", "Bread", "Milk"],
+          "correctIndex": 1
+        },
+        {
+          "id": "r4_q2",
+          "type": "true_false",
+          "prompt": "The offer ends on Friday.",
+          "options": ["True", "False"],
+          "correctIndex": 0
+        }
+      ]
+    },
+    {
+      "id": "reading_a1_email_5",
+      "unitId": "unit_reading_a1_basics",
+      "module": "reading",
+      "level": "a1",
+      "title": "Short Email",
+      "passageText": "Hi Anna, meeting starts at 10:00 in Room 3. See you!",
+      "questions": [
+        {
+          "id": "r5_q1",
+          "type": "mcq",
+          "prompt": "What time is the meeting?",
+          "options": ["09:00", "10:00", "11:00", "12:00"],
+          "correctIndex": 1
+        },
+        {
+          "id": "r5_q2",
+          "type": "mcq",
+          "prompt": "Where is the meeting?",
+          "options": ["Room 1", "Room 2", "Room 3", "Room 4"],
+          "correctIndex": 2
         }
       ]
     },
@@ -99,14 +172,14 @@
       "audioAsset": "assets/audio/listening_a1_station_1.mp3",
       "questions": [
         {
-          "id": "q1",
+          "id": "l1_q1",
           "type": "mcq",
           "prompt": "Which platform is announced?",
           "options": ["1", "2", "3", "4"],
           "correctIndex": 2
         },
         {
-          "id": "q2",
+          "id": "l1_q2",
           "type": "true_false",
           "prompt": "The train is late.",
           "options": ["True", "False"],
@@ -124,18 +197,93 @@
       "audioAsset": "assets/audio/listening_a1_market_2.mp3",
       "questions": [
         {
-          "id": "q1",
+          "id": "l2_q1",
           "type": "mcq",
           "prompt": "What does the customer buy?",
           "options": ["Bread", "Milk", "Eggs", "Rice"],
           "correctIndex": 1
         },
         {
-          "id": "q2",
+          "id": "l2_q2",
           "type": "mcq",
           "prompt": "How many bottles are requested?",
           "options": ["One", "Two", "Three", "Four"],
           "correctIndex": 0
+        }
+      ]
+    },
+    {
+      "id": "listening_a1_weather_3",
+      "unitId": "unit_listening_a1_basics",
+      "module": "listening",
+      "level": "a1",
+      "title": "Weather Report",
+      "passageText": "Listen to the daily weather report.",
+      "audioAsset": "assets/audio/listening_a1_weather_3.mp3",
+      "questions": [
+        {
+          "id": "l3_q1",
+          "type": "mcq",
+          "prompt": "How is the weather today?",
+          "options": ["Rainy", "Sunny", "Snowy", "Windy"],
+          "correctIndex": 1
+        },
+        {
+          "id": "l3_q2",
+          "type": "true_false",
+          "prompt": "It will be cold tonight.",
+          "options": ["True", "False"],
+          "correctIndex": 0
+        }
+      ]
+    },
+    {
+      "id": "listening_a1_cafe_4",
+      "unitId": "unit_listening_a1_basics",
+      "module": "listening",
+      "level": "a1",
+      "title": "Cafe Order",
+      "passageText": "Listen to an order at a cafe.",
+      "audioAsset": "assets/audio/listening_a1_cafe_4.mp3",
+      "questions": [
+        {
+          "id": "l4_q1",
+          "type": "mcq",
+          "prompt": "What drink is ordered?",
+          "options": ["Tea", "Coffee", "Water", "Juice"],
+          "correctIndex": 1
+        },
+        {
+          "id": "l4_q2",
+          "type": "mcq",
+          "prompt": "What size is requested?",
+          "options": ["Small", "Medium", "Large", "No size"],
+          "correctIndex": 2
+        }
+      ]
+    },
+    {
+      "id": "listening_a1_phone_5",
+      "unitId": "unit_listening_a1_basics",
+      "module": "listening",
+      "level": "a1",
+      "title": "Phone Reminder",
+      "passageText": "Listen to a short voice reminder.",
+      "audioAsset": "assets/audio/listening_a1_phone_5.mp3",
+      "questions": [
+        {
+          "id": "l5_q1",
+          "type": "mcq",
+          "prompt": "What day is the appointment?",
+          "options": ["Monday", "Tuesday", "Wednesday", "Thursday"],
+          "correctIndex": 1
+        },
+        {
+          "id": "l5_q2",
+          "type": "true_false",
+          "prompt": "The reminder is for 9:00.",
+          "options": ["True", "False"],
+          "correctIndex": 1
         }
       ]
     },
@@ -153,14 +301,14 @@
       ],
       "questions": [
         {
-          "id": "q1",
+          "id": "g1_q1",
           "type": "mcq",
           "prompt": "Choose the correct sentence.",
           "options": ["She are happy.", "She is happy.", "She am happy."],
           "correctIndex": 1
         },
         {
-          "id": "q2",
+          "id": "g1_q2",
           "type": "true_false",
           "prompt": "'I are ready' is correct.",
           "options": ["True", "False"],
@@ -182,18 +330,103 @@
       ],
       "questions": [
         {
-          "id": "q1",
+          "id": "g2_q1",
           "type": "mcq",
           "prompt": "Choose the best phrase.",
           "options": ["a apple", "an apple", "a an apple"],
           "correctIndex": 1
         },
         {
-          "id": "q2",
+          "id": "g2_q2",
           "type": "mcq",
           "prompt": "Which one is correct?",
           "options": ["an car", "a car", "an cars"],
           "correctIndex": 1
+        }
+      ]
+    },
+    {
+      "id": "grammar_a1_plural_3",
+      "unitId": "unit_grammar_a1_basics",
+      "module": "grammar",
+      "level": "a1",
+      "title": "Plural Nouns",
+      "explanationMarkdown": "Most nouns add **-s** for plural. Some add **-es**.",
+      "examples": [
+        "book -> books",
+        "bus -> buses",
+        "box -> boxes"
+      ],
+      "questions": [
+        {
+          "id": "g3_q1",
+          "type": "mcq",
+          "prompt": "Plural of 'book' is...",
+          "options": ["bookes", "books", "books'", "book"],
+          "correctIndex": 1
+        },
+        {
+          "id": "g3_q2",
+          "type": "true_false",
+          "prompt": "'Buses' is the plural of 'bus'.",
+          "options": ["True", "False"],
+          "correctIndex": 0
+        }
+      ]
+    },
+    {
+      "id": "grammar_a1_have_4",
+      "unitId": "unit_grammar_a1_basics",
+      "module": "grammar",
+      "level": "a1",
+      "title": "Have / Has",
+      "explanationMarkdown": "Use **have** with I/you/we/they and **has** with he/she/it.",
+      "examples": [
+        "I have a bike.",
+        "She has a cat."
+      ],
+      "questions": [
+        {
+          "id": "g4_q1",
+          "type": "mcq",
+          "prompt": "Choose the correct sentence.",
+          "options": ["He have a car.", "He has a car.", "He having a car."],
+          "correctIndex": 1
+        },
+        {
+          "id": "g4_q2",
+          "type": "mcq",
+          "prompt": "Complete: They ___ two dogs.",
+          "options": ["has", "have", "having", "haves"],
+          "correctIndex": 1
+        }
+      ]
+    },
+    {
+      "id": "grammar_a1_present_5",
+      "unitId": "unit_grammar_a1_basics",
+      "module": "grammar",
+      "level": "a1",
+      "title": "Simple Present",
+      "explanationMarkdown": "For he/she/it, many verbs add **-s** in simple present.",
+      "examples": [
+        "I work every day.",
+        "She works every day."
+      ],
+      "questions": [
+        {
+          "id": "g5_q1",
+          "type": "mcq",
+          "prompt": "Choose the correct sentence.",
+          "options": ["She work here.", "She works here.", "She working here."],
+          "correctIndex": 1
+        },
+        {
+          "id": "g5_q2",
+          "type": "true_false",
+          "prompt": "'He plays football.' is correct.",
+          "options": ["True", "False"],
+          "correctIndex": 0
         }
       ]
     }
