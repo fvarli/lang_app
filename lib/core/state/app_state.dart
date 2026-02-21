@@ -47,8 +47,14 @@ class AppState extends ChangeNotifier {
   }
 
   Future<void> completeLesson(String lessonId) async {
+    final today = _todayKey();
+    final todayCount = progress.completedOnDate == today
+        ? progress.completedLessonsToday
+        : 0;
     final completed = {...progress.completedLessonIds, lessonId};
     progress = progress.copyWith(
+      completedLessonsToday: todayCount + 1,
+      completedOnDate: today,
       completedLessonIds: completed,
       streak: progress.streak + 1,
     );
@@ -60,5 +66,13 @@ class AppState extends ChangeNotifier {
     await _progressStore.reset();
     progress = UserProgress.empty();
     notifyListeners();
+  }
+
+  String _todayKey() {
+    final now = DateTime.now();
+    final year = now.year.toString().padLeft(4, '0');
+    final month = now.month.toString().padLeft(2, '0');
+    final day = now.day.toString().padLeft(2, '0');
+    return '$year-$month-$day';
   }
 }

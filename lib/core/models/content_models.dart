@@ -166,6 +166,8 @@ class UserProgress {
   const UserProgress({
     required this.selectedLevel,
     required this.dailyGoalMinutes,
+    required this.completedLessonsToday,
+    required this.completedOnDate,
     required this.streak,
     required this.completedLessonIds,
     required this.darkMode,
@@ -173,13 +175,31 @@ class UserProgress {
 
   final Level selectedLevel;
   final int dailyGoalMinutes;
+  final int completedLessonsToday;
+  final String? completedOnDate;
   final int streak;
   final Set<String> completedLessonIds;
   final bool darkMode;
 
+  double get todayProgressRatio {
+    if (dailyGoalMinutes <= 0) {
+      return 0;
+    }
+    final ratio = completedLessonsToday / dailyGoalMinutes;
+    if (ratio < 0) {
+      return 0;
+    }
+    if (ratio > 1) {
+      return 1;
+    }
+    return ratio;
+  }
+
   UserProgress copyWith({
     Level? selectedLevel,
     int? dailyGoalMinutes,
+    int? completedLessonsToday,
+    String? completedOnDate,
     int? streak,
     Set<String>? completedLessonIds,
     bool? darkMode,
@@ -187,6 +207,9 @@ class UserProgress {
     return UserProgress(
       selectedLevel: selectedLevel ?? this.selectedLevel,
       dailyGoalMinutes: dailyGoalMinutes ?? this.dailyGoalMinutes,
+      completedLessonsToday:
+          completedLessonsToday ?? this.completedLessonsToday,
+      completedOnDate: completedOnDate ?? this.completedOnDate,
       streak: streak ?? this.streak,
       completedLessonIds: completedLessonIds ?? this.completedLessonIds,
       darkMode: darkMode ?? this.darkMode,
@@ -197,6 +220,8 @@ class UserProgress {
     return {
       'selectedLevel': selectedLevel.name,
       'dailyGoalMinutes': dailyGoalMinutes,
+      'completedLessonsToday': completedLessonsToday,
+      'completedOnDate': completedOnDate,
       'streak': streak,
       'completedLessonIds': completedLessonIds.toList(growable: false),
       'darkMode': darkMode,
@@ -207,6 +232,8 @@ class UserProgress {
     return UserProgress(
       selectedLevel: _levelFromJson(json['selectedLevel'] as String),
       dailyGoalMinutes: json['dailyGoalMinutes'] as int,
+      completedLessonsToday: json['completedLessonsToday'] as int? ?? 0,
+      completedOnDate: json['completedOnDate'] as String?,
       streak: json['streak'] as int,
       completedLessonIds: (json['completedLessonIds'] as List<dynamic>)
           .map((e) => e as String)
@@ -219,6 +246,8 @@ class UserProgress {
     return const UserProgress(
       selectedLevel: Level.a1,
       dailyGoalMinutes: 5,
+      completedLessonsToday: 0,
+      completedOnDate: null,
       streak: 0,
       completedLessonIds: <String>{},
       darkMode: false,

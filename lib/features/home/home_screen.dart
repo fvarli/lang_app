@@ -59,6 +59,27 @@ class HomeScreen extends StatelessWidget {
                   ),
                 ),
               ),
+              const SizedBox(height: 12),
+              Card(
+                child: Padding(
+                  padding: const EdgeInsets.all(16),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'Today: ${appState.progress.completedLessonsToday} / ${appState.progress.dailyGoalMinutes}',
+                        style: Theme.of(context).textTheme.titleMedium,
+                      ),
+                      const SizedBox(height: 10),
+                      LinearProgressIndicator(
+                        value: appState.progress.todayProgressRatio,
+                        minHeight: 10,
+                        borderRadius: BorderRadius.circular(999),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
               const SizedBox(height: 16),
               GridView.builder(
                 shrinkWrap: true,
