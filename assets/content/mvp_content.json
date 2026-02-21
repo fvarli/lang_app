@@ -1,0 +1,80 @@
+{
+  "modules": [
+    {
+      "id": "reading",
+      "type": "reading",
+      "title": "Reading",
+      "description": "Short texts and quick comprehension drills"
+    },
+    {
+      "id": "listening",
+      "type": "listening",
+      "title": "Listening",
+      "description": "Audio clips with focused comprehension questions"
+    },
+    {
+      "id": "grammar",
+      "type": "grammar",
+      "title": "Grammar",
+      "description": "Bite-sized rules and practical exercises"
+    }
+  ],
+  "lessons": [
+    {
+      "id": "reading_a1_intro_1",
+      "module": "reading",
+      "level": "a1",
+      "title": "Cafe Sign Reading",
+      "content": "Read: 'Open 8:00 - 18:00. Closed on Sunday.' What does it mean for visitors?",
+      "questions": [
+        {
+          "id": "q1",
+          "type": "mcq",
+          "prompt": "When is the cafe closed?",
+          "options": ["Sunday", "Saturday", "Monday", "Friday"],
+          "correctIndex": 0
+        },
+        {
+          "id": "q2",
+          "type": "true_false",
+          "prompt": "The cafe is open at 19:00.",
+          "options": ["True", "False"],
+          "correctIndex": 1
+        }
+      ]
+    },
+    {
+      "id": "listening_a1_intro_1",
+      "module": "listening",
+      "level": "a1",
+      "title": "Train Station Announcement",
+      "content": "Listen and answer. (Audio playback UI will be implemented in Day 2.)",
+      "audioAsset": "assets/audio/listening_a1_intro_1.mp3",
+      "questions": [
+        {
+          "id": "q1",
+          "type": "mcq",
+          "prompt": "Which platform is announced?",
+          "options": ["1", "2", "3", "4"],
+          "correctIndex": 2
+        }
+      ]
+    },
+    {
+      "id": "grammar_a1_intro_1",
+      "module": "grammar",
+      "level": "a1",
+      "title": "To Be: am/is/are",
+      "content": "Use 'am' with I, 'is' with he/she/it, and 'are' with you/we/they.",
+      "questions": [
+        {
+          "id": "q1",
+          "type": "mcq",
+          "prompt": "Choose the correct sentence:",
+          "options": ["She are a teacher.", "She is a teacher.", "She am a teacher."],
+          "correctIndex": 1
+        }
+      ]
+    }
+  ]
+}
