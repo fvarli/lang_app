@@ -31,7 +31,7 @@ class LessonScreen extends StatelessWidget {
             return;
           }
           context.go(
-            '${AppRoutes.result}?score=${result.score}&total=${result.total}&module=${result.moduleName}',
+            '${AppRoutes.result}?score=${result.score}&total=${result.total}&module=${result.moduleName}&lesson=${result.lessonId}',
           );
         },
       ),

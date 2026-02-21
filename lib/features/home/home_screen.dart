@@ -126,6 +126,9 @@ class _ModuleCard extends StatelessWidget {
           (lesson) => state.progress.completedLessonIds.contains(lesson.id),
         )
         .length;
+    final percent = lessons.isEmpty
+        ? 0
+        : ((completed / lessons.length) * 100).round();
 
     return Card(
       child: InkWell(
@@ -146,6 +149,10 @@ class _ModuleCard extends StatelessWidget {
               const SizedBox(height: 8),
               Text(
                 '$completed/${lessons.length} completed',
+                style: Theme.of(context).textTheme.bodySmall,
+              ),
+              Text(
+                '$percent% progress',
                 style: Theme.of(context).textTheme.bodySmall,
               ),
               const Spacer(),

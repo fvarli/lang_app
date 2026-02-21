@@ -7,11 +7,25 @@ void main() {
   test('ContentBundle parses unified schema JSON', () {
     const raw = '''
     {
+      "schemaVersion": 1,
+      "levels": ["a1", "a2", "b1", "b2", "c1", "c2"],
       "modules": [
         {
           "id": "reading",
           "type": "reading",
           "title": "Reading",
+          "description": "desc"
+        },
+        {
+          "id": "listening",
+          "type": "listening",
+          "title": "Listening",
+          "description": "desc"
+        },
+        {
+          "id": "grammar",
+          "type": "grammar",
+          "title": "Grammar",
           "description": "desc"
         }
       ],
@@ -33,7 +47,7 @@ void main() {
           "passageText": "Text",
           "questions": [
             {
-              "id": "q1",
+              "id": "rq1",
               "type": "mcq",
               "prompt": "Prompt",
               "options": ["A", "B"],
@@ -49,7 +63,7 @@ void main() {
           "audioAsset": "assets/audio/l1.mp3",
           "questions": [
             {
-              "id": "q1",
+              "id": "lq1",
               "type": "mcq",
               "prompt": "Prompt",
               "options": ["A", "B"],
@@ -66,7 +80,7 @@ void main() {
           "examples": ["I am fine."],
           "questions": [
             {
-              "id": "q1",
+              "id": "gq1",
               "type": "mcq",
               "prompt": "Prompt",
               "options": ["A", "B"],
@@ -82,7 +96,9 @@ void main() {
       jsonDecode(raw) as Map<String, dynamic>,
     );
 
-    expect(bundle.modules, hasLength(1));
+    expect(bundle.schemaVersion, 1);
+    expect(bundle.levels, hasLength(6));
+    expect(bundle.modules, hasLength(3));
     expect(bundle.units, hasLength(1));
     expect(bundle.lessons, hasLength(3));
     expect(bundle.lessons.first.module, ModuleType.reading);
@@ -98,6 +114,8 @@ void main() {
   test('ContentBundle filters lessons by level and module', () {
     const raw = '''
     {
+      "schemaVersion": 1,
+      "levels": ["a1", "a2", "b1", "b2", "c1", "c2"],
       "modules": [
         {"id": "reading", "type": "reading", "title": "Reading", "description": "desc"},
         {"id": "grammar", "type": "grammar", "title": "Grammar", "description": "desc"}
@@ -118,7 +136,7 @@ void main() {
           "level": "b1",
           "title": "R2",
           "passageText": "Text",
-          "questions": [{"id": "q1", "type": "mcq", "prompt": "Prompt", "options": ["A", "B"], "correctIndex": 0}]
+          "questions": [{"id": "q2", "type": "mcq", "prompt": "Prompt", "options": ["A", "B"], "correctIndex": 0}]
         },
         {
           "id": "grammar_a1_1",
@@ -127,7 +145,7 @@ void main() {
           "title": "G1",
           "explanationMarkdown": "x",
           "examples": ["e1"],
-          "questions": [{"id": "q1", "type": "mcq", "prompt": "Prompt", "options": ["A", "B"], "correctIndex": 0}]
+          "questions": [{"id": "q3", "type": "mcq", "prompt": "Prompt", "options": ["A", "B"], "correctIndex": 0}]
         }
       ]
     }
@@ -150,5 +168,62 @@ void main() {
     expect(readingA1.first.id, 'reading_a1_1');
     expect(grammarA1, hasLength(1));
     expect(grammarA1.first.id, 'grammar_a1_1');
+  });
+
+  test('ContentBundle fails with clear message on duplicate lesson IDs', () {
+    const raw = '''
+    {
+      "schemaVersion": 1,
+      "levels": ["a1", "a2", "b1", "b2", "c1", "c2"],
+      "modules": [
+        {"id": "reading", "type": "reading", "title": "Reading", "description": "desc"}
+      ],
+      "units": [],
+      "lessons": [
+        {
+          "id": "same_id",
+          "module": "reading",
+          "level": "a1",
+          "title": "L1",
+          "passageText": "Text",
+          "questions": [{"id": "q1", "type": "mcq", "prompt": "Prompt", "options": ["A", "B"], "correctIndex": 0}]
+        },
+        {
+          "id": "same_id",
+          "module": "reading",
+          "level": "a1",
+          "title": "L2",
+          "passageText": "Text",
+          "questions": [{"id": "q2", "type": "mcq", "prompt": "Prompt", "options": ["A", "B"], "correctIndex": 0}]
+        }
+      ]
+    }
+    ''';
+
+    expect(
+      () => ContentBundle.fromJson(jsonDecode(raw) as Map<String, dynamic>),
+      throwsA(
+        isA<ContentValidationException>().having(
+          (e) => e.message,
+          'message',
+          contains('Duplicate lesson id'),
+        ),
+      ),
+    );
+  });
+
+  test('ContentBundle fails when schemaVersion is missing', () {
+    const raw = '''
+    {
+      "levels": ["a1", "a2", "b1", "b2", "c1", "c2"],
+      "modules": [],
+      "lessons": []
+    }
+    ''';
+
+    expect(
+      () => ContentBundle.fromJson(jsonDecode(raw) as Map<String, dynamic>),
+      throwsA(isA<ContentValidationException>()),
+    );
   });
 }

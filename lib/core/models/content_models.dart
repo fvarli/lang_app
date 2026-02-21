@@ -1,3 +1,12 @@
+class ContentValidationException implements Exception {
+  ContentValidationException(this.message);
+
+  final String message;
+
+  @override
+  String toString() => 'ContentValidationException: $message';
+}
+
 enum Level { a1, a2, b1, b2, c1, c2 }
 
 enum ModuleType { reading, listening, grammar }
@@ -19,15 +28,40 @@ class Question {
   final List<String> options;
   final int correctIndex;
 
-  factory Question.fromJson(Map<String, dynamic> json) {
+  factory Question.fromJson(
+    Map<String, dynamic> json, {
+    required String context,
+  }) {
+    final id = _requireString(json, 'id', context);
+    final typeRaw = _requireString(json, 'type', '$context($id)');
+    final prompt = _requireString(json, 'prompt', '$context($id)');
+    final options = _requireStringList(json, 'options', '$context($id)');
+    final correctIndex = _requireInt(json, 'correctIndex', '$context($id)');
+
+    if (options.length < 2) {
+      throw ContentValidationException(
+        '$context($id).options must contain at least 2 values',
+      );
+    }
+    if (correctIndex < 0 || correctIndex >= options.length) {
+      throw ContentValidationException(
+        '$context($id).correctIndex out of range for options length ${options.length}',
+      );
+    }
+
+    final type = _questionTypeFromJson(typeRaw, '$context($id).type');
+    if (type == QuestionType.trueFalse && options.length != 2) {
+      throw ContentValidationException(
+        '$context($id) true_false questions must provide exactly 2 options',
+      );
+    }
+
     return Question(
-      id: json['id'] as String,
-      type: _questionTypeFromJson(json['type'] as String),
-      prompt: json['prompt'] as String,
-      options: (json['options'] as List<dynamic>)
-          .map((e) => e as String)
-          .toList(growable: false),
-      correctIndex: json['correctIndex'] as int,
+      id: id,
+      type: type,
+      prompt: prompt,
+      options: options,
+      correctIndex: correctIndex,
     );
   }
 }
@@ -57,22 +91,43 @@ class Lesson {
   final List<String> examples;
   final List<Question> questions;
 
-  factory Lesson.fromJson(Map<String, dynamic> json) {
+  factory Lesson.fromJson(
+    Map<String, dynamic> json, {
+    required String context,
+  }) {
+    final id = _requireString(json, 'id', context);
+    final moduleRaw = _requireString(json, 'module', '$context($id)');
+    final levelRaw = _requireString(json, 'level', '$context($id)');
+
+    final questionsRaw = _requireList(json, 'questions', '$context($id)');
+    final parsedQuestions = <Question>[];
+    for (var i = 0; i < questionsRaw.length; i++) {
+      final entry = questionsRaw[i];
+      if (entry is! Map<String, dynamic>) {
+        throw ContentValidationException(
+          '$context($id).questions[$i] must be an object',
+        );
+      }
+      parsedQuestions.add(
+        Question.fromJson(entry, context: '$context($id).question'),
+      );
+    }
+
     return Lesson(
-      id: json['id'] as String,
-      unitId: json['unitId'] as String?,
-      module: _moduleTypeFromJson(json['module'] as String),
-      level: _levelFromJson(json['level'] as String),
-      title: json['title'] as String,
-      passageText: json['passageText'] as String?,
-      audioAsset: json['audioAsset'] as String?,
-      explanationMarkdown: json['explanationMarkdown'] as String?,
-      examples: (json['examples'] as List<dynamic>? ?? const <dynamic>[])
-          .map((e) => e as String)
-          .toList(growable: false),
-      questions: (json['questions'] as List<dynamic>)
-          .map((e) => Question.fromJson(e as Map<String, dynamic>))
-          .toList(growable: false),
+      id: id,
+      unitId: _optionalString(json, 'unitId', '$context($id)'),
+      module: _moduleTypeFromJson(moduleRaw, '$context($id).module'),
+      level: _levelFromJson(levelRaw, '$context($id).level'),
+      title: _requireString(json, 'title', '$context($id)'),
+      passageText: _optionalString(json, 'passageText', '$context($id)'),
+      audioAsset: _optionalString(json, 'audioAsset', '$context($id)'),
+      explanationMarkdown: _optionalString(
+        json,
+        'explanationMarkdown',
+        '$context($id)',
+      ),
+      examples: _optionalStringList(json, 'examples', '$context($id)'),
+      questions: parsedQuestions,
     );
   }
 }
@@ -90,12 +145,19 @@ class Module {
   final String title;
   final String description;
 
-  factory Module.fromJson(Map<String, dynamic> json) {
+  factory Module.fromJson(
+    Map<String, dynamic> json, {
+    required String context,
+  }) {
+    final id = _requireString(json, 'id', context);
     return Module(
-      id: json['id'] as String,
-      type: _moduleTypeFromJson(json['type'] as String),
-      title: json['title'] as String,
-      description: json['description'] as String,
+      id: id,
+      type: _moduleTypeFromJson(
+        _requireString(json, 'type', '$context($id)'),
+        '$context($id).type',
+      ),
+      title: _requireString(json, 'title', '$context($id)'),
+      description: _requireString(json, 'description', '$context($id)'),
     );
   }
 }
@@ -113,38 +175,167 @@ class Unit {
   final Level level;
   final String title;
 
-  factory Unit.fromJson(Map<String, dynamic> json) {
+  factory Unit.fromJson(Map<String, dynamic> json, {required String context}) {
+    final id = _requireString(json, 'id', context);
     return Unit(
-      id: json['id'] as String,
-      module: _moduleTypeFromJson(json['module'] as String),
-      level: _levelFromJson(json['level'] as String),
-      title: json['title'] as String,
+      id: id,
+      module: _moduleTypeFromJson(
+        _requireString(json, 'module', '$context($id)'),
+        '$context($id).module',
+      ),
+      level: _levelFromJson(
+        _requireString(json, 'level', '$context($id)'),
+        '$context($id).level',
+      ),
+      title: _requireString(json, 'title', '$context($id)'),
     );
   }
 }
 
 class ContentBundle {
   const ContentBundle({
+    required this.schemaVersion,
+    required this.levels,
     required this.modules,
     required this.units,
     required this.lessons,
   });
 
+  final int schemaVersion;
+  final List<Level> levels;
   final List<Module> modules;
   final List<Unit> units;
   final List<Lesson> lessons;
 
   factory ContentBundle.fromJson(Map<String, dynamic> json) {
+    final schemaVersion = _requireInt(json, 'schemaVersion', 'root');
+    if (schemaVersion != 1) {
+      throw ContentValidationException(
+        'Unsupported schemaVersion=$schemaVersion (expected 1)',
+      );
+    }
+
+    final levelsRaw = _requireStringList(json, 'levels', 'root');
+    final parsedLevels = <Level>[];
+    final levelSet = <Level>{};
+    for (final levelRaw in levelsRaw) {
+      final level = _levelFromJson(levelRaw, 'root.levels');
+      if (!levelSet.add(level)) {
+        throw ContentValidationException(
+          'Duplicate level "$levelRaw" in root.levels',
+        );
+      }
+      parsedLevels.add(level);
+    }
+
+    final modulesRaw = _requireList(json, 'modules', 'root');
+    final parsedModules = <Module>[];
+    final moduleIdSet = <String>{};
+    for (var i = 0; i < modulesRaw.length; i++) {
+      final item = modulesRaw[i];
+      if (item is! Map<String, dynamic>) {
+        throw ContentValidationException('root.modules[$i] must be an object');
+      }
+      final module = Module.fromJson(item, context: 'module');
+      if (!moduleIdSet.add(module.id)) {
+        throw ContentValidationException('Duplicate module id "${module.id}"');
+      }
+      parsedModules.add(module);
+    }
+
+    final unitsRaw = _optionalList(json, 'units', 'root') ?? const <dynamic>[];
+    final parsedUnits = <Unit>[];
+    final unitIdSet = <String>{};
+    for (var i = 0; i < unitsRaw.length; i++) {
+      final item = unitsRaw[i];
+      if (item is! Map<String, dynamic>) {
+        throw ContentValidationException('root.units[$i] must be an object');
+      }
+      final unit = Unit.fromJson(item, context: 'unit');
+      if (!unitIdSet.add(unit.id)) {
+        throw ContentValidationException('Duplicate unit id "${unit.id}"');
+      }
+      if (!moduleIdSet.contains(unit.module.name)) {
+        throw ContentValidationException(
+          'Unit "${unit.id}" references missing module "${unit.module.name}"',
+        );
+      }
+      if (!levelSet.contains(unit.level)) {
+        throw ContentValidationException(
+          'Unit "${unit.id}" references missing level "${unit.level.name}"',
+        );
+      }
+      parsedUnits.add(unit);
+    }
+
+    final lessonsRaw = _requireList(json, 'lessons', 'root');
+    final parsedLessons = <Lesson>[];
+    final lessonIdSet = <String>{};
+    final questionIdSet = <String>{};
+
+    for (var i = 0; i < lessonsRaw.length; i++) {
+      final item = lessonsRaw[i];
+      if (item is! Map<String, dynamic>) {
+        throw ContentValidationException('root.lessons[$i] must be an object');
+      }
+      final lesson = Lesson.fromJson(item, context: 'lesson');
+
+      if (!lessonIdSet.add(lesson.id)) {
+        throw ContentValidationException('Duplicate lesson id "${lesson.id}"');
+      }
+      if (!moduleIdSet.contains(lesson.module.name)) {
+        throw ContentValidationException(
+          'Lesson "${lesson.id}" references missing module "${lesson.module.name}"',
+        );
+      }
+      if (!levelSet.contains(lesson.level)) {
+        throw ContentValidationException(
+          'Lesson "${lesson.id}" references missing level "${lesson.level.name}"',
+        );
+      }
+
+      if (lesson.unitId != null) {
+        Unit? unit;
+        for (final candidate in parsedUnits) {
+          if (candidate.id == lesson.unitId) {
+            unit = candidate;
+            break;
+          }
+        }
+        if (unit == null) {
+          throw ContentValidationException(
+            'Lesson "${lesson.id}" references missing unit "${lesson.unitId}"',
+          );
+        }
+        if (unit.module != lesson.module) {
+          throw ContentValidationException(
+            'Lesson "${lesson.id}" unit/module mismatch: unit=${unit.module.name}, lesson=${lesson.module.name}',
+          );
+        }
+        if (unit.level != lesson.level) {
+          throw ContentValidationException(
+            'Lesson "${lesson.id}" unit/level mismatch: unit=${unit.level.name}, lesson=${lesson.level.name}',
+          );
+        }
+      }
+
+      for (final question in lesson.questions) {
+        if (!questionIdSet.add(question.id)) {
+          throw ContentValidationException(
+            'Duplicate question id "${question.id}" across lessons',
+          );
+        }
+      }
+
+      parsedLessons.add(lesson);
+    }
+
     return ContentBundle(
-      modules: (json['modules'] as List<dynamic>)
-          .map((e) => Module.fromJson(e as Map<String, dynamic>))
-          .toList(growable: false),
-      units: (json['units'] as List<dynamic>? ?? const <dynamic>[])
-          .map((e) => Unit.fromJson(e as Map<String, dynamic>))
-          .toList(growable: false),
-      lessons: (json['lessons'] as List<dynamic>)
-          .map((e) => Lesson.fromJson(e as Map<String, dynamic>))
-          .toList(growable: false),
+      schemaVersion: schemaVersion,
+      levels: parsedLevels,
+      modules: parsedModules,
+      units: parsedUnits,
+      lessons: parsedLessons,
     );
   }
 
@@ -230,11 +421,14 @@ class UserProgress {
 
   factory UserProgress.fromJson(Map<String, dynamic> json) {
     return UserProgress(
-      selectedLevel: _levelFromJson(json['selectedLevel'] as String),
-      dailyGoalMinutes: json['dailyGoalMinutes'] as int,
+      selectedLevel: _levelFromJson(
+        _requireString(json, 'selectedLevel', 'userProgress'),
+        'userProgress.selectedLevel',
+      ),
+      dailyGoalMinutes: _requireInt(json, 'dailyGoalMinutes', 'userProgress'),
       completedLessonsToday: json['completedLessonsToday'] as int? ?? 0,
       completedOnDate: json['completedOnDate'] as String?,
-      streak: json['streak'] as int,
+      streak: _requireInt(json, 'streak', 'userProgress'),
       completedLessonIds: (json['completedLessonIds'] as List<dynamic>)
           .map((e) => e as String)
           .toSet(),
@@ -255,17 +449,138 @@ class UserProgress {
   }
 }
 
-Level _levelFromJson(String value) {
-  return Level.values.firstWhere((e) => e.name == value.toLowerCase());
+String _requireString(Map<String, dynamic> map, String key, String context) {
+  final value = map[key];
+  if (value is! String || value.isEmpty) {
+    throw ContentValidationException(
+      '$context.$key is required and must be a non-empty string',
+    );
+  }
+  return value;
 }
 
-ModuleType _moduleTypeFromJson(String value) {
-  return ModuleType.values.firstWhere((e) => e.name == value.toLowerCase());
+String? _optionalString(Map<String, dynamic> map, String key, String context) {
+  final value = map[key];
+  if (value == null) {
+    return null;
+  }
+  if (value is! String) {
+    throw ContentValidationException(
+      '$context.$key must be a string when present',
+    );
+  }
+  return value;
 }
 
-QuestionType _questionTypeFromJson(String value) {
-  if (value.toLowerCase() == 'true_false') {
+int _requireInt(Map<String, dynamic> map, String key, String context) {
+  final value = map[key];
+  if (value is! int) {
+    throw ContentValidationException(
+      '$context.$key is required and must be an int',
+    );
+  }
+  return value;
+}
+
+List<dynamic> _requireList(
+  Map<String, dynamic> map,
+  String key,
+  String context,
+) {
+  final value = map[key];
+  if (value is! List<dynamic>) {
+    throw ContentValidationException(
+      '$context.$key is required and must be a list',
+    );
+  }
+  return value;
+}
+
+List<dynamic>? _optionalList(
+  Map<String, dynamic> map,
+  String key,
+  String context,
+) {
+  final value = map[key];
+  if (value == null) {
+    return null;
+  }
+  if (value is! List<dynamic>) {
+    throw ContentValidationException(
+      '$context.$key must be a list when present',
+    );
+  }
+  return value;
+}
+
+List<String> _requireStringList(
+  Map<String, dynamic> map,
+  String key,
+  String context,
+) {
+  final raw = _requireList(map, key, context);
+  final result = <String>[];
+  for (var i = 0; i < raw.length; i++) {
+    final value = raw[i];
+    if (value is! String || value.isEmpty) {
+      throw ContentValidationException(
+        '$context.$key[$i] must be a non-empty string',
+      );
+    }
+    result.add(value);
+  }
+  return result;
+}
+
+List<String> _optionalStringList(
+  Map<String, dynamic> map,
+  String key,
+  String context,
+) {
+  final raw = _optionalList(map, key, context);
+  if (raw == null) {
+    return const <String>[];
+  }
+  final result = <String>[];
+  for (var i = 0; i < raw.length; i++) {
+    final value = raw[i];
+    if (value is! String || value.isEmpty) {
+      throw ContentValidationException(
+        '$context.$key[$i] must be a non-empty string',
+      );
+    }
+    result.add(value);
+  }
+  return result;
+}
+
+Level _levelFromJson(String value, String context) {
+  for (final level in Level.values) {
+    if (level.name == value.toLowerCase()) {
+      return level;
+    }
+  }
+  throw ContentValidationException('$context has unsupported level "$value"');
+}
+
+ModuleType _moduleTypeFromJson(String value, String context) {
+  for (final module in ModuleType.values) {
+    if (module.name == value.toLowerCase()) {
+      return module;
+    }
+  }
+  throw ContentValidationException('$context has unsupported module "$value"');
+}
+
+QuestionType _questionTypeFromJson(String value, String context) {
+  final normalized = value.toLowerCase();
+  if (normalized == 'true_false') {
     return QuestionType.trueFalse;
   }
-  return QuestionType.mcq;
+  if (normalized == 'mcq') {
+    return QuestionType.mcq;
+  }
+  throw ContentValidationException(
+    '$context has unsupported question type "$value"',
+  );
 }

@@ -45,7 +45,28 @@ class ModuleListScreen extends StatelessWidget {
               subtitle: Text(
                 _subtitleForLesson(content: content, lesson: lesson),
               ),
-              trailing: Icon(done ? Icons.check_circle : Icons.play_circle),
+              trailing: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Icon(done ? Icons.check_circle : Icons.play_circle),
+                  const SizedBox(height: 4),
+                  if (done)
+                    Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 8,
+                        vertical: 2,
+                      ),
+                      decoration: BoxDecoration(
+                        color: Theme.of(context).colorScheme.primaryContainer,
+                        borderRadius: BorderRadius.circular(999),
+                      ),
+                      child: Text(
+                        'Completed',
+                        style: Theme.of(context).textTheme.labelSmall,
+                      ),
+                    ),
+                ],
+              ),
               onTap: () =>
                   context.push('${AppRoutes.lesson}?lesson=${lesson.id}'),
             ),
