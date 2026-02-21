@@ -14,9 +14,8 @@ set -euo pipefail
 #   CLEAN=1 ./start_android.sh
 #
 # Notes:
-# - Keeps scope simple: starts emulator if needed, then runs pub get/analyze/test/run.
-# - If emulator is already running, it reuses it.
-
+# - Starts (or reuses) an Android emulator, then runs pub get/format/analyze/test/run.
+# - Forces running on an Android device (emulator preferred).
 
 log() { printf "✅ %s\n" "$*" >&2; }
 warn() { printf "⚠️ %s\n" "$*" >&2; }
@@ -43,6 +42,22 @@ require_exec() { [ -x "$1" ] || die "Missing or not executable: $1"; }
 
 get_running_emulator_id() {
   "$ADB_BIN" devices | awk 'NR>1 && $1 ~ /^emulator-/ && $2=="device"{print $1; exit 0}'
+}
+
+get_first_android_device_id() {
+  # Prefer emulator, fallback to first physical device.
+  local emu phys
+  emu="$("$ADB_BIN" devices | awk 'NR>1 && $1 ~ /^emulator-/ && $2=="device"{print $1; exit 0}')"
+  if [ -n "${emu:-}" ]; then
+    echo "$emu"
+    return 0
+  fi
+  phys="$("$ADB_BIN" devices | awk 'NR>1 && $1 !~ /^emulator-/ && $2=="device"{print $1; exit 0}')"
+  if [ -n "${phys:-}" ]; then
+    echo "$phys"
+    return 0
+  fi
+  return 1
 }
 
 wait_for_boot() {
@@ -106,6 +121,8 @@ cd "$PROJECT_ROOT"
 [ -f "pubspec.yaml" ] || die "pubspec.yaml not found. Are you in the Flutter project root? ($PROJECT_ROOT)"
 
 require_cmd flutter
+require_cmd dart
+
 log "Project root: $PROJECT_ROOT"
 
 # Optional clean
@@ -119,16 +136,22 @@ require_exec "$ADB_BIN"
 require_exec "$EMULATOR_BIN"
 
 # Start or reuse emulator
-EMU_TARGET="$(start_emulator_if_needed)"
+_="$(start_emulator_if_needed)" >/dev/null
+
+# Pick Android target id (emulator preferred)
+ANDROID_TARGET="$(get_first_android_device_id || true)"
+[ -n "${ANDROID_TARGET:-}" ] || die "No Android device detected via adb. Is the emulator running?"
+
+log "ANDROID_TARGET='$ANDROID_TARGET'"
 
 # Dependencies
 log "Running: flutter pub get"
 flutter pub get
 
-# Format (optional)
+# Format (optional) - only lib + test
 if [ "$SKIP_FORMAT" != "1" ]; then
-  log "Running: dart format ."
-  dart format .
+  log "Running: dart format lib test"
+  dart format lib test
 else
   warn "Skipping format (SKIP_FORMAT=1)"
 fi
@@ -149,7 +172,6 @@ else
   warn "Skipping tests (SKIP_TESTS=1)"
 fi
 
-log "EMU_TARGET='$EMU_TARGET'"
-# Run on emulator
-log "Running: flutter run -d $EMU_TARGET"
-flutter run -d "$EMU_TARGET"
+# Run on Android target
+log "Running: flutter run -d $ANDROID_TARGET"
+flutter run -d "$ANDROID_TARGET"
