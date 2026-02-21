@@ -103,7 +103,13 @@ start_emulator_if_needed() {
   [ -n "$AVD_NAME" ] || die "No AVD found. Create one in Android Studio → Device Manager."
 
   log "Starting emulator: $AVD_NAME"
-  "$EMULATOR_BIN" -avd "$AVD_NAME" -netdelay none -netspeed full >/tmp/emulator.log 2>&1 &
+# --- Emulator runtime flags (can override with EMU_FLAGS env) ---
+EMU_FLAGS_DEFAULT="-netdelay none -netspeed full -no-snapshot -no-boot-anim -cores 4"
+EMU_FLAGS="${EMU_FLAGS:-$EMU_FLAGS_DEFAULT}"
+
+log "Starting emulator: $AVD_NAME"
+# shellcheck disable=SC2086
+"$EMULATOR_BIN" -avd "$AVD_NAME" $EMU_FLAGS >/tmp/emulator.log 2>&1 &
 
   log "Waiting for emulator device..."
   "$ADB_BIN" wait-for-device
