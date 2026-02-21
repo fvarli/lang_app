@@ -40,6 +40,39 @@ void main() {
               "correctIndex": 0
             }
           ]
+        },
+        {
+          "id": "listening_a1_1",
+          "module": "listening",
+          "level": "a1",
+          "title": "L1",
+          "audioAsset": "assets/audio/l1.mp3",
+          "questions": [
+            {
+              "id": "q1",
+              "type": "mcq",
+              "prompt": "Prompt",
+              "options": ["A", "B"],
+              "correctIndex": 0
+            }
+          ]
+        },
+        {
+          "id": "grammar_a1_1",
+          "module": "grammar",
+          "level": "a1",
+          "title": "G1",
+          "explanationMarkdown": "Use **am**",
+          "examples": ["I am fine."],
+          "questions": [
+            {
+              "id": "q1",
+              "type": "mcq",
+              "prompt": "Prompt",
+              "options": ["A", "B"],
+              "correctIndex": 0
+            }
+          ]
         }
       ]
     }
@@ -51,12 +84,15 @@ void main() {
 
     expect(bundle.modules, hasLength(1));
     expect(bundle.units, hasLength(1));
-    expect(bundle.lessons, hasLength(1));
+    expect(bundle.lessons, hasLength(3));
     expect(bundle.lessons.first.module, ModuleType.reading);
     expect(bundle.lessons.first.level, Level.a1);
     expect(bundle.lessons.first.passageText, 'Text');
     expect(bundle.lessons.first.unitId, 'unit_reading_a1');
     expect(bundle.lessons.first.questions.first.options.first, 'A');
+    expect(bundle.lessons[1].audioAsset, 'assets/audio/l1.mp3');
+    expect(bundle.lessons[2].explanationMarkdown, 'Use **am**');
+    expect(bundle.lessons[2].examples.first, 'I am fine.');
   });
 
   test('ContentBundle filters lessons by level and module', () {
