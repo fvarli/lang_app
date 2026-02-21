@@ -1,4 +1,5 @@
 {
+  "levels": ["a1", "a2", "b1", "b2", "c1", "c2"],
   "modules": [
     {
       "id": "reading",
@@ -19,37 +20,83 @@
       "description": "Bite-sized rules and practical exercises"
     }
   ],
-  "lessons": [
+  "units": [
     {
-      "id": "reading_a1_intro_1",
+      "id": "unit_reading_a1_basics",
       "module": "reading",
       "level": "a1",
-      "title": "Cafe Sign Reading",
-      "content": "Read: 'Open 8:00 - 18:00. Closed on Sunday.' What does it mean for visitors?",
+      "title": "Everyday Signs"
+    },
+    {
+      "id": "unit_listening_a1_basics",
+      "module": "listening",
+      "level": "a1",
+      "title": "Daily Announcements"
+    },
+    {
+      "id": "unit_grammar_a1_basics",
+      "module": "grammar",
+      "level": "a1",
+      "title": "Starter Grammar"
+    }
+  ],
+  "lessons": [
+    {
+      "id": "reading_a1_signs_1",
+      "unitId": "unit_reading_a1_basics",
+      "module": "reading",
+      "level": "a1",
+      "title": "Cafe Opening Times",
+      "passageText": "Sign: Open 08:00-18:00. Closed Sunday.",
       "questions": [
         {
           "id": "q1",
           "type": "mcq",
           "prompt": "When is the cafe closed?",
-          "options": ["Sunday", "Saturday", "Monday", "Friday"],
+          "options": ["Sunday", "Monday", "Friday", "Saturday"],
           "correctIndex": 0
         },
         {
           "id": "q2",
           "type": "true_false",
-          "prompt": "The cafe is open at 19:00.",
+          "prompt": "The cafe is open at 17:30.",
+          "options": ["True", "False"],
+          "correctIndex": 0
+        }
+      ]
+    },
+    {
+      "id": "reading_a1_notice_2",
+      "unitId": "unit_reading_a1_basics",
+      "module": "reading",
+      "level": "a1",
+      "title": "Library Rules",
+      "passageText": "Notice: Please be quiet. No food or drinks inside.",
+      "questions": [
+        {
+          "id": "q1",
+          "type": "mcq",
+          "prompt": "What is not allowed?",
+          "options": ["Reading", "Food and drinks", "Silence", "Books"],
+          "correctIndex": 1
+        },
+        {
+          "id": "q2",
+          "type": "true_false",
+          "prompt": "You should be loud in the library.",
           "options": ["True", "False"],
           "correctIndex": 1
         }
       ]
     },
     {
-      "id": "listening_a1_intro_1",
+      "id": "listening_a1_station_1",
+      "unitId": "unit_listening_a1_basics",
       "module": "listening",
       "level": "a1",
-      "title": "Train Station Announcement",
-      "content": "Listen and answer. (Audio playback UI will be implemented in Day 2.)",
-      "audioAsset": "assets/audio/listening_a1_intro_1.mp3",
+      "title": "Train Platform Announcement",
+      "passageText": "Listen to a short station announcement and answer.",
+      "audioAsset": "assets/audio/listening_a1_station_1.mp3",
       "questions": [
         {
           "id": "q1",
@@ -57,21 +104,95 @@
           "prompt": "Which platform is announced?",
           "options": ["1", "2", "3", "4"],
           "correctIndex": 2
+        },
+        {
+          "id": "q2",
+          "type": "true_false",
+          "prompt": "The train is late.",
+          "options": ["True", "False"],
+          "correctIndex": 1
         }
       ]
     },
     {
-      "id": "grammar_a1_intro_1",
-      "module": "grammar",
+      "id": "listening_a1_market_2",
+      "unitId": "unit_listening_a1_basics",
+      "module": "listening",
       "level": "a1",
-      "title": "To Be: am/is/are",
-      "content": "Use 'am' with I, 'is' with he/she/it, and 'are' with you/we/they.",
+      "title": "Market Audio Note",
+      "passageText": "Listen to a shopping conversation.",
+      "audioAsset": "assets/audio/listening_a1_market_2.mp3",
       "questions": [
         {
           "id": "q1",
           "type": "mcq",
-          "prompt": "Choose the correct sentence:",
-          "options": ["She are a teacher.", "She is a teacher.", "She am a teacher."],
+          "prompt": "What does the customer buy?",
+          "options": ["Bread", "Milk", "Eggs", "Rice"],
+          "correctIndex": 1
+        },
+        {
+          "id": "q2",
+          "type": "mcq",
+          "prompt": "How many bottles are requested?",
+          "options": ["One", "Two", "Three", "Four"],
+          "correctIndex": 0
+        }
+      ]
+    },
+    {
+      "id": "grammar_a1_be_1",
+      "unitId": "unit_grammar_a1_basics",
+      "module": "grammar",
+      "level": "a1",
+      "title": "Verb To Be",
+      "explanationMarkdown": "Use **am** with I, **is** with he/she/it, and **are** with you/we/they.",
+      "examples": [
+        "I am a student.",
+        "She is at home.",
+        "They are friends."
+      ],
+      "questions": [
+        {
+          "id": "q1",
+          "type": "mcq",
+          "prompt": "Choose the correct sentence.",
+          "options": ["She are happy.", "She is happy.", "She am happy."],
+          "correctIndex": 1
+        },
+        {
+          "id": "q2",
+          "type": "true_false",
+          "prompt": "'I are ready' is correct.",
+          "options": ["True", "False"],
+          "correctIndex": 1
+        }
+      ]
+    },
+    {
+      "id": "grammar_a1_articles_2",
+      "unitId": "unit_grammar_a1_basics",
+      "module": "grammar",
+      "level": "a1",
+      "title": "A / An Basics",
+      "explanationMarkdown": "Use **a** before consonant sounds and **an** before vowel sounds.",
+      "examples": [
+        "a book",
+        "an apple",
+        "an hour"
+      ],
+      "questions": [
+        {
+          "id": "q1",
+          "type": "mcq",
+          "prompt": "Choose the best phrase.",
+          "options": ["a apple", "an apple", "a an apple"],
+          "correctIndex": 1
+        },
+        {
+          "id": "q2",
+          "type": "mcq",
+          "prompt": "Which one is correct?",
+          "options": ["an car", "a car", "an cars"],
           "correctIndex": 1
         }
       ]

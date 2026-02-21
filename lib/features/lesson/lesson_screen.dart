@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../app/router.dart';
+import '../../core/models/content_models.dart';
 import '../../core/state/app_state_scope.dart';
 
 class LessonScreen extends StatefulWidget {
@@ -43,18 +44,7 @@ class _LessonScreenState extends State<LessonScreen> {
                 children: [
                   Text(lesson.module.name.toUpperCase()),
                   const SizedBox(height: 8),
-                  Text(
-                    lesson.content,
-                    style: Theme.of(context).textTheme.bodyMedium,
-                  ),
-                  if (lesson.audioAsset != null) ...[
-                    const SizedBox(height: 12),
-                    const ListTile(
-                      contentPadding: EdgeInsets.zero,
-                      leading: Icon(Icons.audiotrack),
-                      title: Text('Audio player placeholder (MVP structure)'),
-                    ),
-                  ],
+                  ..._buildLessonContent(context: context, lesson: lesson),
                 ],
               ),
             ),
@@ -112,7 +102,7 @@ class _LessonScreenState extends State<LessonScreen> {
                       return;
                     }
                     context.go(
-                      '${AppRoutes.result}?score=$_score&total=${lesson.questions.length}',
+                      '${AppRoutes.result}?score=$_score&total=${lesson.questions.length}&module=${lesson.module.name}',
                     );
                   },
             style: FilledButton.styleFrom(
@@ -127,5 +117,53 @@ class _LessonScreenState extends State<LessonScreen> {
         ],
       ),
     );
+  }
+
+  List<Widget> _buildLessonContent({
+    required BuildContext context,
+    required Lesson lesson,
+  }) {
+    switch (lesson.module) {
+      case ModuleType.reading:
+        return [
+          Text(
+            lesson.passageText ?? 'No passage text available.',
+            style: Theme.of(context).textTheme.bodyMedium,
+          ),
+        ];
+      case ModuleType.listening:
+        return [
+          if (lesson.passageText != null)
+            Text(
+              lesson.passageText!,
+              style: Theme.of(context).textTheme.bodyMedium,
+            ),
+          if (lesson.audioAsset != null) ...[
+            const SizedBox(height: 12),
+            ListTile(
+              contentPadding: EdgeInsets.zero,
+              leading: const Icon(Icons.audiotrack),
+              title: Text('Audio placeholder: ${lesson.audioAsset}'),
+            ),
+          ],
+        ];
+      case ModuleType.grammar:
+        return [
+          Text(
+            lesson.explanationMarkdown ?? 'No explanation available.',
+            style: Theme.of(context).textTheme.bodyMedium,
+          ),
+          if (lesson.examples.isNotEmpty) ...[
+            const SizedBox(height: 12),
+            Text('Examples', style: Theme.of(context).textTheme.titleMedium),
+            const SizedBox(height: 6),
+            for (final example in lesson.examples)
+              Padding(
+                padding: const EdgeInsets.only(bottom: 4),
+                child: Text('• $example'),
+              ),
+          ],
+        ];
+    }
   }
 }

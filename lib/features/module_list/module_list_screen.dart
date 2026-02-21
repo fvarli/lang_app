@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../app/router.dart';
+import '../../core/models/content_models.dart';
 import '../../core/state/app_state_scope.dart';
 
 class ModuleListScreen extends StatelessWidget {
@@ -19,13 +20,11 @@ class ModuleListScreen extends StatelessWidget {
     }
 
     final selectedModule = content.modules.where((m) => m.id == moduleId).first;
-    final lessons = content.lessons
-        .where(
-          (lesson) =>
-              lesson.module.name == moduleId &&
-              lesson.level.index <= state.progress.selectedLevel.index,
-        )
-        .toList(growable: false);
+    final moduleType = ModuleType.values.firstWhere((m) => m.name == moduleId);
+    final lessons = content.lessonsForLevelAndModule(
+      level: state.progress.selectedLevel,
+      module: moduleType,
+    );
 
     return Scaffold(
       appBar: AppBar(title: Text(selectedModule.title)),
@@ -43,7 +42,9 @@ class ModuleListScreen extends StatelessWidget {
               ),
               leading: CircleAvatar(child: Text('${index + 1}')),
               title: Text(lesson.title),
-              subtitle: Text('Level ${lesson.level.name.toUpperCase()}'),
+              subtitle: Text(
+                _subtitleForLesson(content: content, lesson: lesson),
+              ),
               trailing: Icon(done ? Icons.check_circle : Icons.play_circle),
               onTap: () =>
                   context.push('${AppRoutes.lesson}?lesson=${lesson.id}'),
@@ -52,5 +53,22 @@ class ModuleListScreen extends StatelessWidget {
         },
       ),
     );
+  }
+
+  String _subtitleForLesson({
+    required ContentBundle content,
+    required Lesson lesson,
+  }) {
+    Unit? unit;
+    for (final candidate in content.units) {
+      if (candidate.id == lesson.unitId) {
+        unit = candidate;
+        break;
+      }
+    }
+    if (unit == null) {
+      return 'Level ${lesson.level.name.toUpperCase()}';
+    }
+    return '${unit.title} • ${lesson.level.name.toUpperCase()}';
   }
 }

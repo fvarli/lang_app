@@ -35,30 +35,41 @@ class Question {
 class Lesson {
   const Lesson({
     required this.id,
+    required this.unitId,
     required this.module,
     required this.level,
     required this.title,
-    required this.content,
+    required this.passageText,
     required this.audioAsset,
+    required this.explanationMarkdown,
+    required this.examples,
     required this.questions,
   });
 
   final String id;
+  final String? unitId;
   final ModuleType module;
   final Level level;
   final String title;
-  final String content;
+  final String? passageText;
   final String? audioAsset;
+  final String? explanationMarkdown;
+  final List<String> examples;
   final List<Question> questions;
 
   factory Lesson.fromJson(Map<String, dynamic> json) {
     return Lesson(
       id: json['id'] as String,
+      unitId: json['unitId'] as String?,
       module: _moduleTypeFromJson(json['module'] as String),
       level: _levelFromJson(json['level'] as String),
       title: json['title'] as String,
-      content: json['content'] as String,
+      passageText: json['passageText'] as String?,
       audioAsset: json['audioAsset'] as String?,
+      explanationMarkdown: json['explanationMarkdown'] as String?,
+      examples: (json['examples'] as List<dynamic>? ?? const <dynamic>[])
+          .map((e) => e as String)
+          .toList(growable: false),
       questions: (json['questions'] as List<dynamic>)
           .map((e) => Question.fromJson(e as Map<String, dynamic>))
           .toList(growable: false),
@@ -89,16 +100,47 @@ class Module {
   }
 }
 
+class Unit {
+  const Unit({
+    required this.id,
+    required this.module,
+    required this.level,
+    required this.title,
+  });
+
+  final String id;
+  final ModuleType module;
+  final Level level;
+  final String title;
+
+  factory Unit.fromJson(Map<String, dynamic> json) {
+    return Unit(
+      id: json['id'] as String,
+      module: _moduleTypeFromJson(json['module'] as String),
+      level: _levelFromJson(json['level'] as String),
+      title: json['title'] as String,
+    );
+  }
+}
+
 class ContentBundle {
-  const ContentBundle({required this.modules, required this.lessons});
+  const ContentBundle({
+    required this.modules,
+    required this.units,
+    required this.lessons,
+  });
 
   final List<Module> modules;
+  final List<Unit> units;
   final List<Lesson> lessons;
 
   factory ContentBundle.fromJson(Map<String, dynamic> json) {
     return ContentBundle(
       modules: (json['modules'] as List<dynamic>)
           .map((e) => Module.fromJson(e as Map<String, dynamic>))
+          .toList(growable: false),
+      units: (json['units'] as List<dynamic>? ?? const <dynamic>[])
+          .map((e) => Unit.fromJson(e as Map<String, dynamic>))
           .toList(growable: false),
       lessons: (json['lessons'] as List<dynamic>)
           .map((e) => Lesson.fromJson(e as Map<String, dynamic>))
@@ -108,6 +150,15 @@ class ContentBundle {
 
   List<Lesson> lessonsForModule(ModuleType type) {
     return lessons.where((e) => e.module == type).toList(growable: false);
+  }
+
+  List<Lesson> lessonsForLevelAndModule({
+    required Level level,
+    required ModuleType module,
+  }) {
+    return lessons
+        .where((lesson) => lesson.module == module && lesson.level == level)
+        .toList(growable: false);
   }
 }
 

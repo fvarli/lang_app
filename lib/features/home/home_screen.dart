@@ -90,11 +90,21 @@ class _ModuleCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final state = AppStateScope.of(context);
     final icon = switch (module.type) {
       ModuleType.reading => Icons.menu_book_outlined,
       ModuleType.listening => Icons.headphones_outlined,
       ModuleType.grammar => Icons.spellcheck_outlined,
     };
+    final lessons = state.content!.lessonsForLevelAndModule(
+      level: state.progress.selectedLevel,
+      module: module.type,
+    );
+    final completed = lessons
+        .where(
+          (lesson) => state.progress.completedLessonIds.contains(lesson.id),
+        )
+        .length;
 
     return Card(
       child: InkWell(
@@ -112,6 +122,11 @@ class _ModuleCard extends StatelessWidget {
               Text(module.title, style: Theme.of(context).textTheme.titleLarge),
               const SizedBox(height: 8),
               Text(module.description),
+              const SizedBox(height: 8),
+              Text(
+                '$completed/${lessons.length} completed',
+                style: Theme.of(context).textTheme.bodySmall,
+              ),
               const Spacer(),
               const Align(
                 alignment: Alignment.bottomRight,
