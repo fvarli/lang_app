@@ -1,17 +1,28 @@
-# lang_app
+# LangRoutine
 
-A new Flutter project.
+Offline-first Flutter MVP focused on Reading, Listening, and Grammar practice.
 
-## Getting Started
+## Release Build Commands (Android)
 
-This project is a starting point for a Flutter application.
+```bash
+flutter pub get
+flutter analyze
+flutter test
+flutter build apk --release
+flutter build appbundle --release
+```
 
-A few resources to get you started if this is your first Flutter project:
+## Build Outputs
 
-- [Learn Flutter](https://docs.flutter.dev/get-started/learn-flutter)
-- [Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Flutter learning resources](https://docs.flutter.dev/reference/learning-resources)
+- APK: `build/app/outputs/flutter-apk/app-release.apk`
+- AAB: `build/app/outputs/bundle/release/app-release.aab`
 
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+## Basic Verification Steps
+
+1. Install APK on a device/emulator and launch.
+2. Verify app name is **LangRoutine** on launcher.
+3. Verify package id:
+   - `adb shell dumpsys package com.langroutine.app | head`
+4. Open Settings and confirm About shows version/build and feedback action.
+5. Run content validator:
+   - `dart run tool/validate_content.dart`
