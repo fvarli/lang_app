@@ -47,4 +47,23 @@ abstract final class AppColors {
   static const success = Color(0xFF059669);
   static const error = Color(0xFFDC2626);
   static const warning = Color(0xFFD97706);
+
+  // Answer feedback — light
+  static const correctBg = Color(0xFFDCFCE7);
+  static const incorrectBg = Color(0xFFFEE2E2);
+
+  // Answer feedback — dark
+  static const correctBgDark = Color(0xFF052E16);
+  static const incorrectBgDark = Color(0xFF2D0A0A);
+
+  // Answer feedback — borders
+  static const correctBorder = Color(0xFF16A34A);
+  static const incorrectBorder = Color(0xFFDC2626);
+}
+
+abstract final class AppDurations {
+  static const fast = Duration(milliseconds: 200);
+  static const medium = Duration(milliseconds: 350);
+  static const slow = Duration(milliseconds: 600);
+  static const scoreRing = Duration(milliseconds: 1200);
 }

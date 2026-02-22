@@ -3,8 +3,10 @@ import 'package:flutter_markdown/flutter_markdown.dart';
 
 import '../../../core/models/content_models.dart';
 import '../../../core/theme/design_tokens.dart';
+import '../../../core/ui/answer_tile.dart';
 import '../../../core/ui/lesson_content_card.dart';
 import '../../../core/ui/primary_button.dart';
+import '../../../core/ui/question_stepper.dart';
 
 class LessonResultPayload {
   const LessonResultPayload({
@@ -39,12 +41,65 @@ class _LessonPlayerState extends State<LessonPlayer> {
   int _score = 0;
   int? _selected;
   bool _isPlaying = false;
+  bool _revealed = false;
+  final Set<int> _completedSteps = {};
+
+  AnswerTileState _computeTileState(int index, Question question) {
+    if (!_revealed) {
+      if (_selected == index) return AnswerTileState.selected;
+      return AnswerTileState.idle;
+    }
+    if (_selected == index) {
+      return index == question.correctIndex
+          ? AnswerTileState.correct
+          : AnswerTileState.incorrect;
+    }
+    return AnswerTileState.idle;
+  }
+
+  bool _shouldShowCorrectHighlight(int index, Question question) {
+    if (!_revealed) return false;
+    if (_selected == question.correctIndex) return false;
+    return index == question.correctIndex;
+  }
+
+  void _checkAnswer(Question question) {
+    setState(() {
+      _revealed = true;
+      if (_selected == question.correctIndex) {
+        _score += 1;
+      }
+      _completedSteps.add(_questionIndex);
+    });
+  }
+
+  void _advance() {
+    final lesson = widget.lesson;
+    if (_questionIndex < lesson.questions.length - 1) {
+      setState(() {
+        _questionIndex += 1;
+        _selected = null;
+        _revealed = false;
+      });
+      return;
+    }
+
+    widget.onCompleted(
+      LessonResultPayload(
+        lessonId: lesson.id,
+        moduleName: lesson.module.name,
+        score: _score,
+        total: lesson.questions.length,
+      ),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
     final lesson = widget.lesson;
     final question = lesson.questions[_questionIndex];
     final scheme = Theme.of(context).colorScheme;
+    final isLastQuestion = _questionIndex >= lesson.questions.length - 1;
 
     return Center(
       child: ConstrainedBox(
@@ -52,6 +107,12 @@ class _LessonPlayerState extends State<LessonPlayer> {
         child: ListView(
           padding: const EdgeInsets.all(AppSpacing.lg),
           children: [
+            QuestionStepper(
+              totalSteps: lesson.questions.length,
+              currentStep: _questionIndex,
+              completedSteps: _completedSteps,
+            ),
+            const SizedBox(height: AppSpacing.md),
             LessonContentCard(
               moduleLabel: lesson.module.name,
               child: Column(
@@ -76,39 +137,16 @@ class _LessonPlayerState extends State<LessonPlayer> {
                     Text(question.prompt),
                     const SizedBox(height: 10),
                     for (var i = 0; i < question.options.length; i++)
-                      Padding(
-                        padding: const EdgeInsets.only(bottom: AppSpacing.sm),
-                        child: Material(
-                          color: _selected == i
-                              ? scheme.primaryContainer
-                              : scheme.surfaceContainerHighest,
-                          borderRadius: AppRadius.mdAll,
-                          child: InkWell(
-                            borderRadius: AppRadius.mdAll,
-                            onTap: () => setState(() => _selected = i),
-                            child: Padding(
-                              padding: const EdgeInsets.symmetric(
-                                horizontal: AppSpacing.lg,
-                                vertical: 14,
-                              ),
-                              child: Row(
-                                children: [
-                                  Icon(
-                                    _selected == i
-                                        ? Icons.radio_button_checked
-                                        : Icons.radio_button_off,
-                                    color: _selected == i
-                                        ? scheme.primary
-                                        : scheme.outline,
-                                    size: 20,
-                                  ),
-                                  const SizedBox(width: AppSpacing.md),
-                                  Expanded(child: Text(question.options[i])),
-                                ],
-                              ),
-                            ),
-                          ),
+                      AnswerTile(
+                        label: question.options[i],
+                        state: _computeTileState(i, question),
+                        showCorrectHighlight: _shouldShowCorrectHighlight(
+                          i,
+                          question,
                         ),
+                        onTap: _revealed
+                            ? null
+                            : () => setState(() => _selected = i),
                       ),
                   ],
                 ),
@@ -116,32 +154,17 @@ class _LessonPlayerState extends State<LessonPlayer> {
             ),
             const SizedBox(height: 14),
             PrimaryButton(
-              label: _questionIndex < lesson.questions.length - 1
-                  ? 'Next Question'
-                  : 'Finish Lesson',
+              label: _revealed
+                  ? (isLastQuestion ? 'Finish Lesson' : 'Next Question')
+                  : 'Check Answer',
               onPressed: _selected == null
                   ? null
                   : () {
-                      if (_selected == question.correctIndex) {
-                        _score += 1;
-                      }
-
-                      if (_questionIndex < lesson.questions.length - 1) {
-                        setState(() {
-                          _questionIndex += 1;
-                          _selected = null;
-                        });
+                      if (!_revealed) {
+                        _checkAnswer(question);
                         return;
                       }
-
-                      widget.onCompleted(
-                        LessonResultPayload(
-                          lessonId: lesson.id,
-                          moduleName: lesson.module.name,
-                          score: _score,
-                          total: lesson.questions.length,
-                        ),
-                      );
+                      _advance();
                     },
             ),
           ],

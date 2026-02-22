@@ -59,6 +59,8 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                   children: [
                     _BrandMoment(),
                     const Divider(height: AppSpacing.xxxl),
+                    _HowItWorksCard(),
+                    const SizedBox(height: AppSpacing.md),
                     Card(
                       child: Padding(
                         padding: const EdgeInsets.all(AppSpacing.xl),
@@ -66,7 +68,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
-                              'Level',
+                              'What is your English level?',
                               style: Theme.of(context).textTheme.titleMedium,
                             ),
                             const SizedBox(height: 10),
@@ -96,7 +98,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
-                              'Daily goal',
+                              'How much time can you dedicate?',
                               style: Theme.of(context).textTheme.titleMedium,
                             ),
                             const SizedBox(height: 10),
@@ -120,7 +122,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                     ),
                     const SizedBox(height: AppSpacing.xl),
                     PrimaryButton(
-                      label: 'Start LangRoutine',
+                      label: 'Begin Your Routine',
                       icon: Icons.arrow_forward_rounded,
                       onPressed:
                           _selectedLevel == null ||
@@ -180,7 +182,7 @@ class _BrandMoment extends StatelessWidget {
             ),
             const SizedBox(height: 6),
             Text(
-              'A calm daily routine for reading, listening, and grammar.',
+              'Build your English skills in just minutes a day. Calm, structured, and effective.',
               style: Theme.of(context).textTheme.bodyLarge?.copyWith(
                 color: scheme.onSurfaceVariant.withValues(alpha: 0.8),
               ),
@@ -188,6 +190,70 @@ class _BrandMoment extends StatelessWidget {
           ],
         ),
       ),
+    );
+  }
+}
+
+class _HowItWorksCard extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
+    return Card(
+      child: Padding(
+        padding: const EdgeInsets.all(AppSpacing.xl),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              'How it works',
+              style: Theme.of(context).textTheme.titleMedium,
+            ),
+            const SizedBox(height: AppSpacing.md),
+            _HowItWorksRow(
+              icon: Icons.menu_book,
+              label: 'Read short passages to build comprehension',
+              color: scheme.primary,
+            ),
+            const SizedBox(height: AppSpacing.md),
+            _HowItWorksRow(
+              icon: Icons.headphones,
+              label: 'Listen to audio to train your ear',
+              color: scheme.primary,
+            ),
+            const SizedBox(height: AppSpacing.md),
+            _HowItWorksRow(
+              icon: Icons.spellcheck,
+              label: 'Practice grammar with focused exercises',
+              color: scheme.primary,
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _HowItWorksRow extends StatelessWidget {
+  const _HowItWorksRow({
+    required this.icon,
+    required this.label,
+    required this.color,
+  });
+
+  final IconData icon;
+  final String label;
+  final Color color;
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      children: [
+        Icon(icon, color: color, size: 22),
+        const SizedBox(width: AppSpacing.md),
+        Expanded(
+          child: Text(label, style: Theme.of(context).textTheme.bodyMedium),
+        ),
+      ],
     );
   }
 }

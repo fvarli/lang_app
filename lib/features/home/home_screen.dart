@@ -14,6 +14,13 @@ import '../../core/ui/stat_card.dart';
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
 
+  String _greeting() {
+    final hour = DateTime.now().hour;
+    if (hour < 12) return 'Good morning';
+    if (hour < 17) return 'Good afternoon';
+    return 'Good evening';
+  }
+
   @override
   Widget build(BuildContext context) {
     final appState = AppStateScope.of(context);
@@ -43,7 +50,6 @@ class HomeScreen extends StatelessWidget {
       body: LayoutBuilder(
         builder: (context, constraints) {
           final isWide = constraints.maxWidth >= 860;
-          final statsWide = constraints.maxWidth >= 600;
 
           return ListView(
             padding: const EdgeInsets.fromLTRB(
@@ -53,7 +59,10 @@ class HomeScreen extends StatelessWidget {
               AppSpacing.xxl,
             ),
             children: [
-              Text('Today', style: Theme.of(context).textTheme.headlineMedium),
+              Text(
+                _greeting(),
+                style: Theme.of(context).textTheme.headlineMedium,
+              ),
               const SizedBox(height: 6),
               Text(
                 'Stay consistent with short focused sessions.',
@@ -84,55 +93,56 @@ class HomeScreen extends StatelessWidget {
                       ),
                       const SizedBox(height: 10),
                       ProgressBar(value: appState.progress.todayProgressRatio),
-                      const SizedBox(height: 14),
-                      PrimaryButton(
-                        label: nextLessonId == null
-                            ? 'All lessons completed'
-                            : 'Continue',
-                        icon: nextLessonId == null
-                            ? Icons.check_circle_outline
-                            : Icons.play_arrow_rounded,
-                        compact: true,
-                        onPressed: nextLessonId == null
-                            ? null
-                            : () {
-                                context.push(
-                                  '${AppRoutes.lesson}?lesson=$nextLessonId',
-                                );
-                              },
-                      ),
                     ],
                   ),
                 ),
               ),
               const SizedBox(height: AppSpacing.md),
-              GridView.count(
-                shrinkWrap: true,
-                physics: const NeverScrollableScrollPhysics(),
-                crossAxisCount: statsWide ? 3 : 1,
-                mainAxisSpacing: 10,
-                crossAxisSpacing: 10,
-                childAspectRatio: statsWide ? 1.8 : 3.3,
+              PrimaryButton(
+                label: nextLessonId == null
+                    ? 'All Done for Today'
+                    : 'Continue Learning',
+                icon: nextLessonId == null
+                    ? Icons.check_circle_outline
+                    : Icons.play_arrow_rounded,
+                onPressed: nextLessonId == null
+                    ? null
+                    : () {
+                        context.push(
+                          '${AppRoutes.lesson}?lesson=$nextLessonId',
+                        );
+                      },
+              ),
+              const SizedBox(height: AppSpacing.md),
+              Row(
                 children: [
-                  StatCard(
-                    label: 'Level',
-                    value: appState.progress.selectedLevel.name.toUpperCase(),
-                    icon: Icons.school_outlined,
+                  Expanded(
+                    child: StatCard(
+                      label: 'Level',
+                      value: appState.progress.selectedLevel.name.toUpperCase(),
+                      icon: Icons.school_outlined,
+                    ),
                   ),
-                  StatCard(
-                    label: 'Goal',
-                    value: '${appState.progress.dailyGoalMinutes} min',
-                    icon: Icons.timer_outlined,
+                  const SizedBox(width: 10),
+                  Expanded(
+                    child: StatCard(
+                      label: 'Goal',
+                      value: '${appState.progress.dailyGoalMinutes} min',
+                      icon: Icons.timer_outlined,
+                    ),
                   ),
-                  StatCard(
-                    label: 'Streak',
-                    value: '${appState.progress.streak} day',
-                    icon: Icons.local_fire_department_outlined,
+                  const SizedBox(width: 10),
+                  Expanded(
+                    child: StatCard(
+                      label: 'Streak',
+                      value: '${appState.progress.streak} day',
+                      icon: Icons.local_fire_department_outlined,
+                    ),
                   ),
                 ],
               ),
               const SizedBox(height: AppSpacing.lg),
-              const SectionHeader(title: 'Modules'),
+              const SectionHeader(title: 'Your Modules'),
               const SizedBox(height: 2),
               GridView.builder(
                 shrinkWrap: true,

@@ -5,6 +5,7 @@ import '../../app/router.dart';
 import '../../core/models/content_models.dart';
 import '../../core/state/app_state_scope.dart';
 import '../../core/theme/design_tokens.dart';
+import '../../core/ui/score_ring.dart';
 
 class ResultScreen extends StatelessWidget {
   const ResultScreen({super.key});
@@ -26,6 +27,17 @@ class ResultScreen extends StatelessWidget {
       currentLessonId: lessonId,
     );
 
+    String performanceMessage;
+    if (pct >= 90) {
+      performanceMessage = 'Excellent!';
+    } else if (pct >= 80) {
+      performanceMessage = 'Great work!';
+    } else if (pct >= 60) {
+      performanceMessage = 'Good effort!';
+    } else {
+      performanceMessage = 'Keep practicing!';
+    }
+
     return PopScope(
       canPop: false,
       onPopInvokedWithResult: (didPop, result) {
@@ -43,39 +55,20 @@ class ResultScreen extends StatelessWidget {
                 padding: const EdgeInsets.all(AppSpacing.xxl),
                 child: Card(
                   child: Padding(
-                    padding: const EdgeInsets.all(28),
+                    padding: const EdgeInsets.all(AppSpacing.xxl),
                     child: Column(
                       mainAxisSize: MainAxisSize.min,
                       children: [
                         Text(
                           'Lesson Complete',
-                          style: Theme.of(context).textTheme.headlineMedium,
+                          style: Theme.of(context).textTheme.titleLarge,
                         ),
-                        const SizedBox(height: AppSpacing.md),
-                        if (pct >= 80)
-                          Padding(
-                            padding: const EdgeInsets.only(
-                              bottom: AppSpacing.sm,
-                            ),
-                            child: Icon(
-                              Icons.check_circle,
-                              color: AppColors.success,
-                              size: 32,
-                            ),
-                          ),
+                        const SizedBox(height: AppSpacing.xl),
+                        ScoreRing(score: score, total: total),
+                        const SizedBox(height: AppSpacing.lg),
                         Text(
-                          '$score / $total',
-                          style: Theme.of(context).textTheme.headlineMedium,
-                        ),
-                        const SizedBox(height: AppSpacing.xs),
-                        Text(
-                          '$pct% accuracy',
-                          style: Theme.of(context).textTheme.bodyLarge
-                              ?.copyWith(
-                                color: Theme.of(
-                                  context,
-                                ).colorScheme.onSurfaceVariant,
-                              ),
+                          performanceMessage,
+                          style: Theme.of(context).textTheme.titleLarge,
                         ),
                         const SizedBox(height: AppSpacing.xl),
                         FilledButton(

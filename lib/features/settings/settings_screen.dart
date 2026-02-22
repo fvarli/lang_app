@@ -56,7 +56,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
               subtitle: const Text(
                 'Clear onboarding choices and completed lessons.',
               ),
-              onTap: () => state.resetProgress(),
+              onTap: () => _showResetDialog(context, state),
             ),
           ),
           const SizedBox(height: AppSpacing.md),
@@ -98,6 +98,34 @@ class _SettingsScreenState extends State<SettingsScreen> {
           ),
         ],
       ),
+    );
+  }
+
+  void _showResetDialog(BuildContext context, dynamic state) {
+    showDialog<void>(
+      context: context,
+      builder: (dialogContext) {
+        return AlertDialog(
+          title: const Text('Reset progress?'),
+          content: const Text(
+            'This will clear all your completed lessons, streak, and onboarding choices. This action cannot be undone.',
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(dialogContext).pop(),
+              child: const Text('Cancel'),
+            ),
+            FilledButton(
+              onPressed: () {
+                Navigator.of(dialogContext).pop();
+                state.resetProgress();
+              },
+              style: FilledButton.styleFrom(backgroundColor: AppColors.error),
+              child: const Text('Reset'),
+            ),
+          ],
+        );
+      },
     );
   }
 

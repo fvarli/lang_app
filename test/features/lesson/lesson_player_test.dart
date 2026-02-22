@@ -50,6 +50,8 @@ void main() {
     expect(find.text('Short passage text.'), findsOneWidget);
     await tester.tap(find.widgetWithText(InkWell, 'A'));
     await tester.pump();
+    await tester.tap(find.text('Check Answer'));
+    await tester.pump();
     await tester.tap(find.text('Finish Lesson'));
     await tester.pump();
 

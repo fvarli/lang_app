@@ -32,6 +32,15 @@ class ModuleListScreen extends StatelessWidget {
     );
     final scheme = Theme.of(context).colorScheme;
 
+    // Find the first incomplete lesson index
+    int? currentLessonIndex;
+    for (var i = 0; i < lessons.length; i++) {
+      if (!state.progress.completedLessonIds.contains(lessons[i].id)) {
+        currentLessonIndex = i;
+        break;
+      }
+    }
+
     return Scaffold(
       appBar: AppBar(title: Text(selectedModule.title)),
       body: ListView.builder(
@@ -45,50 +54,139 @@ class ModuleListScreen extends StatelessWidget {
         itemBuilder: (context, index) {
           final lesson = lessons[index];
           final done = state.progress.completedLessonIds.contains(lesson.id);
-          return Card(
-            child: ListTile(
-              contentPadding: const EdgeInsets.symmetric(
-                horizontal: AppSpacing.lg,
-                vertical: AppSpacing.sm,
+          final isCurrent = index == currentLessonIndex;
+
+          // Circle indicator colors
+          Color circleBg;
+          Color circleFg;
+          Widget circleChild;
+
+          if (done) {
+            circleBg = AppColors.success;
+            circleFg = Colors.white;
+            circleChild = Icon(Icons.check, color: circleFg, size: 16);
+          } else if (isCurrent) {
+            circleBg = scheme.primary;
+            circleFg = scheme.onPrimary;
+            circleChild = Text(
+              '${index + 1}',
+              style: TextStyle(
+                color: circleFg,
+                fontWeight: FontWeight.w700,
+                fontSize: 12,
               ),
-              leading: CircleAvatar(
-                backgroundColor: scheme.primaryContainer,
-                foregroundColor: scheme.primary,
-                child: Text('${index + 1}'),
-              ),
-              title: Text(lesson.title),
-              subtitle: Text(
-                _subtitleForLesson(content: content, lesson: lesson),
-              ),
-              trailing: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Icon(
-                    done ? Icons.check_circle : Icons.play_circle,
-                    color: done ? AppColors.success : null,
+            );
+          } else {
+            circleBg = scheme.surfaceContainerHighest;
+            circleFg = scheme.onSurfaceVariant;
+            circleChild = Text(
+              '${index + 1}',
+              style: TextStyle(color: circleFg, fontSize: 12),
+            );
+          }
+
+          return IntrinsicHeight(
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                // Timeline column
+                SizedBox(
+                  width: 48,
+                  child: Column(
+                    children: [
+                      // Top connector
+                      if (index > 0)
+                        Expanded(
+                          child: Container(
+                            width: 2,
+                            color: scheme.outline.withValues(alpha: 0.3),
+                          ),
+                        )
+                      else
+                        const Expanded(child: SizedBox()),
+                      // Circle indicator
+                      Container(
+                        width: 28,
+                        height: 28,
+                        decoration: BoxDecoration(
+                          color: circleBg,
+                          shape: BoxShape.circle,
+                        ),
+                        alignment: Alignment.center,
+                        child: circleChild,
+                      ),
+                      // Bottom connector
+                      if (index < lessons.length - 1)
+                        Expanded(
+                          child: Container(
+                            width: 2,
+                            color: scheme.outline.withValues(alpha: 0.3),
+                          ),
+                        )
+                      else
+                        const Expanded(child: SizedBox()),
+                    ],
                   ),
-                  const SizedBox(height: AppSpacing.xs),
-                  if (done)
-                    Container(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: AppSpacing.sm,
-                        vertical: 2,
-                      ),
-                      decoration: BoxDecoration(
-                        color: AppColors.success.withValues(alpha: 0.12),
-                        borderRadius: BorderRadius.circular(999),
-                      ),
-                      child: Text(
-                        'Completed',
-                        style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                          color: AppColors.success,
+                ),
+                // Lesson card
+                Expanded(
+                  child: Padding(
+                    padding: const EdgeInsets.only(bottom: AppSpacing.sm),
+                    child: Card(
+                      shape: isCurrent
+                          ? RoundedRectangleBorder(
+                              borderRadius: AppRadius.mdAll,
+                              side: BorderSide(
+                                color: scheme.primary,
+                                width: 1.5,
+                              ),
+                            )
+                          : null,
+                      child: ListTile(
+                        contentPadding: const EdgeInsets.symmetric(
+                          horizontal: AppSpacing.lg,
+                          vertical: AppSpacing.sm,
+                        ),
+                        title: Text(lesson.title),
+                        subtitle: Text(
+                          _subtitleForLesson(content: content, lesson: lesson),
+                        ),
+                        trailing: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Icon(
+                              done ? Icons.check_circle : Icons.play_circle,
+                              color: done ? AppColors.success : null,
+                            ),
+                            const SizedBox(height: AppSpacing.xs),
+                            if (done)
+                              Container(
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: AppSpacing.sm,
+                                  vertical: 2,
+                                ),
+                                decoration: BoxDecoration(
+                                  color: AppColors.success.withValues(
+                                    alpha: 0.12,
+                                  ),
+                                  borderRadius: BorderRadius.circular(999),
+                                ),
+                                child: Text(
+                                  'Completed',
+                                  style: Theme.of(context).textTheme.labelSmall
+                                      ?.copyWith(color: AppColors.success),
+                                ),
+                              ),
+                          ],
+                        ),
+                        onTap: () => context.push(
+                          '${AppRoutes.lesson}?lesson=${lesson.id}',
                         ),
                       ),
                     ),
-                ],
-              ),
-              onTap: () =>
-                  context.push('${AppRoutes.lesson}?lesson=${lesson.id}'),
+                  ),
+                ),
+              ],
             ),
           );
         },
