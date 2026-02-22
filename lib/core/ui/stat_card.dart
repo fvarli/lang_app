@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import '../theme/design_tokens.dart';
+
 class StatCard extends StatelessWidget {
   const StatCard({
     super.key,
@@ -14,9 +16,10 @@ class StatCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
     return Card(
       child: Padding(
-        padding: const EdgeInsets.all(14),
+        padding: const EdgeInsets.all(AppSpacing.lg),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           mainAxisSize: MainAxisSize.min,
@@ -24,19 +27,19 @@ class StatCard extends StatelessWidget {
             if (icon != null) ...[
               Icon(
                 icon,
-                size: 16,
-                color: Theme.of(context).colorScheme.onSurfaceVariant,
+                size: 18,
+                color: scheme.primary.withValues(alpha: 0.6),
               ),
-              const SizedBox(height: 8),
+              const SizedBox(height: 6),
             ],
             Text(
               label.toUpperCase(),
-              style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                fontWeight: FontWeight.w700,
-                color: Theme.of(context).colorScheme.onSurfaceVariant,
+              style: Theme.of(context).textTheme.labelSmall?.copyWith(
+                fontWeight: FontWeight.w600,
+                color: scheme.onSurfaceVariant,
               ),
             ),
-            const SizedBox(height: 4),
+            const SizedBox(height: 2),
             Text(value, style: Theme.of(context).textTheme.titleMedium),
           ],
         ),

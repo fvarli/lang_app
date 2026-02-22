@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import '../theme/design_tokens.dart';
+
 class PrimaryButton extends StatelessWidget {
   const PrimaryButton({
     super.key,
@@ -21,8 +23,8 @@ class PrimaryButton extends StatelessWidget {
         : Row(
             mainAxisSize: MainAxisSize.min,
             children: [
-              Icon(icon, size: 18),
-              const SizedBox(width: 8),
+              Icon(icon, size: 20),
+              const SizedBox(width: AppSpacing.sm),
               Text(label),
             ],
           );
@@ -30,9 +32,9 @@ class PrimaryButton extends StatelessWidget {
     return FilledButton(
       onPressed: onPressed,
       style: FilledButton.styleFrom(
-        minimumSize: Size.fromHeight(compact ? 46 : 56),
+        minimumSize: Size.fromHeight(compact ? 48 : 56),
         padding: EdgeInsets.symmetric(
-          horizontal: compact ? 14 : 18,
+          horizontal: compact ? AppSpacing.lg : AppSpacing.xl,
           vertical: compact ? 10 : 14,
         ),
       ),

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../models/content_models.dart';
+import '../theme/design_tokens.dart';
 import 'progress_bar.dart';
 
 class ModuleCard extends StatelessWidget {
@@ -21,6 +22,7 @@ class ModuleCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
     final icon = switch (module.type) {
       ModuleType.reading => Icons.menu_book_outlined,
       ModuleType.listening => Icons.headphones_outlined,
@@ -29,34 +31,46 @@ class ModuleCard extends StatelessWidget {
 
     return Card(
       child: InkWell(
-        borderRadius: BorderRadius.circular(20),
+        borderRadius: AppRadius.lgAll,
         onTap: onTap,
         child: Padding(
-          padding: const EdgeInsets.all(16),
+          padding: const EdgeInsets.all(18),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Row(
                 children: [
-                  Icon(icon, size: 26),
-                  const SizedBox(width: 10),
+                  Container(
+                    width: 40,
+                    height: 40,
+                    decoration: BoxDecoration(
+                      color: scheme.primaryContainer,
+                      borderRadius: AppRadius.smAll,
+                    ),
+                    child: Icon(icon, size: 22, color: scheme.primary),
+                  ),
+                  const SizedBox(width: AppSpacing.md),
                   Expanded(
                     child: Text(
                       module.title,
                       style: Theme.of(context).textTheme.titleLarge,
                     ),
                   ),
-                  const Icon(Icons.arrow_forward_rounded, size: 20),
+                  Icon(
+                    Icons.arrow_forward_rounded,
+                    size: 18,
+                    color: scheme.onSurfaceVariant,
+                  ),
                 ],
               ),
               const SizedBox(height: 10),
               Text(
                 module.description,
                 style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                  color: Theme.of(context).colorScheme.onSurfaceVariant,
+                  color: scheme.onSurfaceVariant,
                 ),
               ),
-              const SizedBox(height: 12),
+              const SizedBox(height: AppSpacing.md),
               Row(
                 children: [
                   Text(
@@ -72,10 +86,10 @@ class ModuleCard extends StatelessWidget {
                   ),
                 ],
               ),
-              const SizedBox(height: 8),
+              const SizedBox(height: AppSpacing.sm),
               ProgressBar(
                 value: totalCount == 0 ? 0 : completedCount / totalCount,
-                height: 8,
+                height: 6,
               ),
             ],
           ),

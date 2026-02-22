@@ -4,9 +4,11 @@ import 'package:go_router/go_router.dart';
 import '../../app/router.dart';
 import '../../core/models/content_models.dart';
 import '../../core/state/app_state_scope.dart';
+import '../../core/theme/design_tokens.dart';
 import '../../core/ui/module_card.dart';
 import '../../core/ui/primary_button.dart';
 import '../../core/ui/progress_bar.dart';
+import '../../core/ui/section_header.dart';
 import '../../core/ui/stat_card.dart';
 
 class HomeScreen extends StatelessWidget {
@@ -44,20 +46,25 @@ class HomeScreen extends StatelessWidget {
           final statsWide = constraints.maxWidth >= 600;
 
           return ListView(
-            padding: const EdgeInsets.fromLTRB(20, 8, 20, 24),
+            padding: const EdgeInsets.fromLTRB(
+              AppSpacing.xxl,
+              AppSpacing.md,
+              AppSpacing.xxl,
+              AppSpacing.xxl,
+            ),
             children: [
               Text('Today', style: Theme.of(context).textTheme.headlineMedium),
               const SizedBox(height: 6),
               Text(
                 'Stay consistent with short focused sessions.',
-                style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                   color: Theme.of(context).colorScheme.onSurfaceVariant,
                 ),
               ),
               const SizedBox(height: 14),
               Card(
                 child: Padding(
-                  padding: const EdgeInsets.all(18),
+                  padding: const EdgeInsets.all(AppSpacing.xl),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
@@ -65,12 +72,13 @@ class HomeScreen extends StatelessWidget {
                         children: [
                           Text(
                             'Today: ${appState.progress.completedLessonsToday} / ${appState.progress.dailyGoalMinutes}',
-                            style: Theme.of(context).textTheme.titleMedium,
+                            style: Theme.of(context).textTheme.titleSmall,
                           ),
                           const Spacer(),
                           Text(
                             '${(appState.progress.todayProgressRatio * 100).round()}%',
-                            style: Theme.of(context).textTheme.bodySmall,
+                            style: Theme.of(context).textTheme.bodySmall
+                                ?.copyWith(fontWeight: FontWeight.w700),
                           ),
                         ],
                       ),
@@ -97,14 +105,14 @@ class HomeScreen extends StatelessWidget {
                   ),
                 ),
               ),
-              const SizedBox(height: 12),
+              const SizedBox(height: AppSpacing.md),
               GridView.count(
                 shrinkWrap: true,
                 physics: const NeverScrollableScrollPhysics(),
                 crossAxisCount: statsWide ? 3 : 1,
                 mainAxisSpacing: 10,
                 crossAxisSpacing: 10,
-                childAspectRatio: statsWide ? 1.6 : 3.3,
+                childAspectRatio: statsWide ? 1.8 : 3.3,
                 children: [
                   StatCard(
                     label: 'Level',
@@ -123,18 +131,18 @@ class HomeScreen extends StatelessWidget {
                   ),
                 ],
               ),
-              const SizedBox(height: 16),
-              Text('Modules', style: Theme.of(context).textTheme.titleLarge),
-              const SizedBox(height: 10),
+              const SizedBox(height: AppSpacing.lg),
+              const SectionHeader(title: 'Modules'),
+              const SizedBox(height: 2),
               GridView.builder(
                 shrinkWrap: true,
                 physics: const NeverScrollableScrollPhysics(),
                 itemCount: modules.length,
                 gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
                   crossAxisCount: isWide ? 3 : 1,
-                  mainAxisSpacing: 12,
-                  crossAxisSpacing: 12,
-                  childAspectRatio: isWide ? 1.05 : 1.28,
+                  mainAxisSpacing: AppSpacing.lg,
+                  crossAxisSpacing: AppSpacing.lg,
+                  childAspectRatio: isWide ? 1.15 : 1.28,
                 ),
                 itemBuilder: (context, index) {
                   final module = modules[index];

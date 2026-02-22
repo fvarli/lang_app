@@ -3,6 +3,7 @@ import 'package:package_info_plus/package_info_plus.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../../core/state/app_state_scope.dart';
+import '../../core/theme/design_tokens.dart';
 
 class SettingsScreen extends StatefulWidget {
   const SettingsScreen({super.key});
@@ -18,14 +19,20 @@ class _SettingsScreenState extends State<SettingsScreen> {
   @override
   Widget build(BuildContext context) {
     final state = AppStateScope.of(context);
+    final scheme = Theme.of(context).colorScheme;
 
     return Scaffold(
       appBar: AppBar(title: const Text('Settings')),
       body: ListView(
-        padding: const EdgeInsets.all(16),
+        padding: const EdgeInsets.all(AppSpacing.xl),
         children: [
-          Text('Preferences', style: Theme.of(context).textTheme.titleMedium),
-          const SizedBox(height: 8),
+          Text(
+            'PREFERENCES',
+            style: Theme.of(
+              context,
+            ).textTheme.titleSmall?.copyWith(color: scheme.onSurfaceVariant),
+          ),
+          const SizedBox(height: AppSpacing.sm),
           Card(
             child: SwitchListTile(
               value: state.progress.darkMode,
@@ -34,12 +41,17 @@ class _SettingsScreenState extends State<SettingsScreen> {
               subtitle: const Text('Switch between light and dark appearance.'),
             ),
           ),
-          const SizedBox(height: 12),
-          Text('Data', style: Theme.of(context).textTheme.titleMedium),
-          const SizedBox(height: 8),
+          const SizedBox(height: AppSpacing.md),
+          Text(
+            'DATA',
+            style: Theme.of(
+              context,
+            ).textTheme.titleSmall?.copyWith(color: scheme.onSurfaceVariant),
+          ),
+          const SizedBox(height: AppSpacing.sm),
           Card(
             child: ListTile(
-              leading: const Icon(Icons.delete_outline),
+              leading: Icon(Icons.delete_outline, color: AppColors.error),
               title: const Text('Reset progress'),
               subtitle: const Text(
                 'Clear onboarding choices and completed lessons.',
@@ -47,9 +59,14 @@ class _SettingsScreenState extends State<SettingsScreen> {
               onTap: () => state.resetProgress(),
             ),
           ),
-          const SizedBox(height: 12),
-          Text('About', style: Theme.of(context).textTheme.titleMedium),
-          const SizedBox(height: 8),
+          const SizedBox(height: AppSpacing.md),
+          Text(
+            'ABOUT',
+            style: Theme.of(
+              context,
+            ).textTheme.titleSmall?.copyWith(color: scheme.onSurfaceVariant),
+          ),
+          const SizedBox(height: AppSpacing.sm),
           Card(
             child: FutureBuilder<PackageInfo>(
               future: _packageInfoFuture,

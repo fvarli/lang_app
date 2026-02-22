@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 import '../../app/router.dart';
 import '../../core/models/content_models.dart';
 import '../../core/state/app_state_scope.dart';
+import '../../core/theme/design_tokens.dart';
 
 class ResultScreen extends StatelessWidget {
   const ResultScreen({super.key});
@@ -39,25 +40,44 @@ class ResultScreen extends StatelessWidget {
             child: ConstrainedBox(
               constraints: const BoxConstraints(maxWidth: 580),
               child: Padding(
-                padding: const EdgeInsets.all(24),
+                padding: const EdgeInsets.all(AppSpacing.xxl),
                 child: Card(
                   child: Padding(
-                    padding: const EdgeInsets.all(24),
+                    padding: const EdgeInsets.all(28),
                     child: Column(
                       mainAxisSize: MainAxisSize.min,
                       children: [
                         Text(
                           'Lesson Complete',
-                          style: Theme.of(context).textTheme.titleLarge,
+                          style: Theme.of(context).textTheme.headlineMedium,
                         ),
-                        const SizedBox(height: 12),
+                        const SizedBox(height: AppSpacing.md),
+                        if (pct >= 80)
+                          Padding(
+                            padding: const EdgeInsets.only(
+                              bottom: AppSpacing.sm,
+                            ),
+                            child: Icon(
+                              Icons.check_circle,
+                              color: AppColors.success,
+                              size: 32,
+                            ),
+                          ),
                         Text(
                           '$score / $total',
                           style: Theme.of(context).textTheme.headlineMedium,
                         ),
-                        const SizedBox(height: 4),
-                        Text('$pct% accuracy'),
-                        const SizedBox(height: 18),
+                        const SizedBox(height: AppSpacing.xs),
+                        Text(
+                          '$pct% accuracy',
+                          style: Theme.of(context).textTheme.bodyLarge
+                              ?.copyWith(
+                                color: Theme.of(
+                                  context,
+                                ).colorScheme.onSurfaceVariant,
+                              ),
+                        ),
+                        const SizedBox(height: AppSpacing.xl),
                         FilledButton(
                           onPressed: () {
                             _goToModuleOrHome(
@@ -67,7 +87,7 @@ class ResultScreen extends StatelessWidget {
                           },
                           child: const Text('Back to Module'),
                         ),
-                        const SizedBox(height: 8),
+                        const SizedBox(height: AppSpacing.sm),
                         OutlinedButton(
                           onPressed: () {
                             if (nextLessonId != null) {

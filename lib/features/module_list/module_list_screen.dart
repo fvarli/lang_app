@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 import '../../app/router.dart';
 import '../../core/models/content_models.dart';
 import '../../core/state/app_state_scope.dart';
+import '../../core/theme/design_tokens.dart';
 
 class ModuleListScreen extends StatelessWidget {
   const ModuleListScreen({super.key, required this.moduleId});
@@ -29,22 +30,32 @@ class ModuleListScreen extends StatelessWidget {
       level: state.progress.selectedLevel,
       moduleId: moduleId,
     );
+    final scheme = Theme.of(context).colorScheme;
 
     return Scaffold(
       appBar: AppBar(title: Text(selectedModule.title)),
       body: ListView.builder(
         itemCount: lessons.length,
-        padding: const EdgeInsets.all(16),
+        padding: const EdgeInsets.fromLTRB(
+          AppSpacing.lg,
+          AppSpacing.lg,
+          AppSpacing.lg,
+          AppSpacing.xxl,
+        ),
         itemBuilder: (context, index) {
           final lesson = lessons[index];
           final done = state.progress.completedLessonIds.contains(lesson.id);
           return Card(
             child: ListTile(
               contentPadding: const EdgeInsets.symmetric(
-                horizontal: 16,
-                vertical: 8,
+                horizontal: AppSpacing.lg,
+                vertical: AppSpacing.sm,
               ),
-              leading: CircleAvatar(child: Text('${index + 1}')),
+              leading: CircleAvatar(
+                backgroundColor: scheme.primaryContainer,
+                foregroundColor: scheme.primary,
+                child: Text('${index + 1}'),
+              ),
               title: Text(lesson.title),
               subtitle: Text(
                 _subtitleForLesson(content: content, lesson: lesson),
@@ -52,21 +63,26 @@ class ModuleListScreen extends StatelessWidget {
               trailing: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Icon(done ? Icons.check_circle : Icons.play_circle),
-                  const SizedBox(height: 4),
+                  Icon(
+                    done ? Icons.check_circle : Icons.play_circle,
+                    color: done ? AppColors.success : null,
+                  ),
+                  const SizedBox(height: AppSpacing.xs),
                   if (done)
                     Container(
                       padding: const EdgeInsets.symmetric(
-                        horizontal: 8,
+                        horizontal: AppSpacing.sm,
                         vertical: 2,
                       ),
                       decoration: BoxDecoration(
-                        color: Theme.of(context).colorScheme.primaryContainer,
+                        color: AppColors.success.withValues(alpha: 0.12),
                         borderRadius: BorderRadius.circular(999),
                       ),
                       child: Text(
                         'Completed',
-                        style: Theme.of(context).textTheme.labelSmall,
+                        style: Theme.of(context).textTheme.labelSmall?.copyWith(
+                          color: AppColors.success,
+                        ),
                       ),
                     ),
                 ],

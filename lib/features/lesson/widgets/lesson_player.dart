@@ -2,6 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_markdown/flutter_markdown.dart';
 
 import '../../../core/models/content_models.dart';
+import '../../../core/theme/design_tokens.dart';
+import '../../../core/ui/lesson_content_card.dart';
+import '../../../core/ui/primary_button.dart';
 
 class LessonResultPayload {
   const LessonResultPayload({
@@ -41,51 +44,70 @@ class _LessonPlayerState extends State<LessonPlayer> {
   Widget build(BuildContext context) {
     final lesson = widget.lesson;
     final question = lesson.questions[_questionIndex];
+    final scheme = Theme.of(context).colorScheme;
 
     return Center(
       child: ConstrainedBox(
         constraints: const BoxConstraints(maxWidth: 900),
         child: ListView(
-          padding: const EdgeInsets.all(16),
+          padding: const EdgeInsets.all(AppSpacing.lg),
           children: [
-            Card(
-              child: Padding(
-                padding: const EdgeInsets.all(16),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(lesson.module.name.toUpperCase()),
-                    const SizedBox(height: 8),
-                    ..._buildLessonContent(context: context, lesson: lesson),
-                  ],
-                ),
+            LessonContentCard(
+              moduleLabel: lesson.module.name,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: _buildLessonContent(context: context, lesson: lesson),
               ),
             ),
-            const SizedBox(height: 12),
+            const SizedBox(height: AppSpacing.md),
             Text(
               'Question ${_questionIndex + 1}/${lesson.questions.length}',
-              style: Theme.of(context).textTheme.titleMedium,
+              style: Theme.of(
+                context,
+              ).textTheme.titleSmall?.copyWith(color: scheme.onSurfaceVariant),
             ),
             const SizedBox(height: 10),
             Card(
               child: Padding(
-                padding: const EdgeInsets.all(16),
+                padding: const EdgeInsets.all(AppSpacing.lg),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(question.prompt),
                     const SizedBox(height: 10),
                     for (var i = 0; i < question.options.length; i++)
-                      Card(
-                        margin: const EdgeInsets.symmetric(vertical: 4),
-                        child: ListTile(
-                          onTap: () => setState(() => _selected = i),
-                          leading: Icon(
-                            _selected == i
-                                ? Icons.radio_button_checked
-                                : Icons.radio_button_off,
+                      Padding(
+                        padding: const EdgeInsets.only(bottom: AppSpacing.sm),
+                        child: Material(
+                          color: _selected == i
+                              ? scheme.primaryContainer
+                              : scheme.surfaceContainerHighest,
+                          borderRadius: AppRadius.mdAll,
+                          child: InkWell(
+                            borderRadius: AppRadius.mdAll,
+                            onTap: () => setState(() => _selected = i),
+                            child: Padding(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: AppSpacing.lg,
+                                vertical: 14,
+                              ),
+                              child: Row(
+                                children: [
+                                  Icon(
+                                    _selected == i
+                                        ? Icons.radio_button_checked
+                                        : Icons.radio_button_off,
+                                    color: _selected == i
+                                        ? scheme.primary
+                                        : scheme.outline,
+                                    size: 20,
+                                  ),
+                                  const SizedBox(width: AppSpacing.md),
+                                  Expanded(child: Text(question.options[i])),
+                                ],
+                              ),
+                            ),
                           ),
-                          title: Text(question.options[i]),
                         ),
                       ),
                   ],
@@ -93,7 +115,10 @@ class _LessonPlayerState extends State<LessonPlayer> {
               ),
             ),
             const SizedBox(height: 14),
-            FilledButton(
+            PrimaryButton(
+              label: _questionIndex < lesson.questions.length - 1
+                  ? 'Next Question'
+                  : 'Finish Lesson',
               onPressed: _selected == null
                   ? null
                   : () {
@@ -118,14 +143,6 @@ class _LessonPlayerState extends State<LessonPlayer> {
                         ),
                       );
                     },
-              style: FilledButton.styleFrom(
-                minimumSize: const Size.fromHeight(54),
-              ),
-              child: Text(
-                _questionIndex < lesson.questions.length - 1
-                    ? 'Next Question'
-                    : 'Finish Lesson',
-              ),
             ),
           ],
         ),
@@ -154,13 +171,13 @@ class _LessonPlayerState extends State<LessonPlayer> {
               lesson.passageText!,
               style: Theme.of(context).textTheme.bodyMedium,
             ),
-          const SizedBox(height: 12),
+          const SizedBox(height: AppSpacing.md),
           Card(
             margin: EdgeInsets.zero,
             child: ListTile(
               contentPadding: const EdgeInsets.symmetric(
-                horizontal: 12,
-                vertical: 4,
+                horizontal: AppSpacing.md,
+                vertical: AppSpacing.xs,
               ),
               leading: IconButton(
                 onPressed: hasAudio
@@ -191,12 +208,12 @@ class _LessonPlayerState extends State<LessonPlayer> {
               style: Theme.of(context).textTheme.bodyMedium,
             ),
           if (lesson.examples.isNotEmpty) ...[
-            const SizedBox(height: 12),
+            const SizedBox(height: AppSpacing.md),
             Text('Examples', style: Theme.of(context).textTheme.titleMedium),
             const SizedBox(height: 6),
             for (final example in lesson.examples)
               Padding(
-                padding: const EdgeInsets.only(bottom: 4),
+                padding: const EdgeInsets.only(bottom: AppSpacing.xs),
                 child: Text('• $example'),
               ),
           ],

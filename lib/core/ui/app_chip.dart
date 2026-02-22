@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import '../theme/design_tokens.dart';
+
 class AppChip extends StatelessWidget {
   const AppChip({
     super.key,
@@ -14,6 +16,7 @@ class AppChip extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
     return ChoiceChip(
       label: Text(label),
       selected: selected,
@@ -21,21 +24,16 @@ class AppChip extends StatelessWidget {
       showCheckmark: false,
       materialTapTargetSize: MaterialTapTargetSize.padded,
       visualDensity: const VisualDensity(horizontal: 0, vertical: 0),
-      selectedColor: Theme.of(
-        context,
-      ).colorScheme.primary.withValues(alpha: 0.16),
-      backgroundColor: Theme.of(context).colorScheme.surface,
-      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
-      side: BorderSide(
-        color: selected
-            ? Theme.of(context).colorScheme.primary
-            : Theme.of(context).colorScheme.outlineVariant,
+      selectedColor: scheme.primaryContainer,
+      backgroundColor: scheme.surface,
+      padding: const EdgeInsets.symmetric(
+        horizontal: AppSpacing.md,
+        vertical: AppSpacing.sm,
       ),
+      side: BorderSide(color: selected ? scheme.primary : scheme.outline),
       labelStyle: TextStyle(
-        fontWeight: selected ? FontWeight.w700 : FontWeight.w600,
-        color: selected
-            ? Theme.of(context).colorScheme.primary
-            : Theme.of(context).colorScheme.onSurface,
+        fontWeight: selected ? FontWeight.w700 : FontWeight.w500,
+        color: selected ? scheme.primary : scheme.onSurface,
       ),
     );
   }

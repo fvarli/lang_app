@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 import '../../app/router.dart';
 import '../../core/models/content_models.dart';
 import '../../core/state/app_state_scope.dart';
+import '../../core/theme/design_tokens.dart';
 import '../../core/ui/app_chip.dart';
 import '../../core/ui/primary_button.dart';
 
@@ -36,7 +37,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
               size: 280,
               color: Theme.of(
                 context,
-              ).colorScheme.primary.withValues(alpha: 0.12),
+              ).colorScheme.primary.withValues(alpha: 0.08),
             ),
           ),
           Positioned(
@@ -46,7 +47,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
               size: 320,
               color: Theme.of(
                 context,
-              ).colorScheme.secondary.withValues(alpha: 0.1),
+              ).colorScheme.secondary.withValues(alpha: 0.06),
             ),
           ),
           SafeArea(
@@ -54,13 +55,13 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
               child: ConstrainedBox(
                 constraints: const BoxConstraints(maxWidth: 780),
                 child: ListView(
-                  padding: const EdgeInsets.all(24),
+                  padding: const EdgeInsets.all(AppSpacing.xxl),
                   children: [
                     _BrandMoment(),
-                    const SizedBox(height: 18),
+                    const Divider(height: AppSpacing.xxxl),
                     Card(
                       child: Padding(
-                        padding: const EdgeInsets.all(18),
+                        padding: const EdgeInsets.all(AppSpacing.xl),
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
@@ -70,8 +71,8 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                             ),
                             const SizedBox(height: 10),
                             Wrap(
-                              spacing: 10,
-                              runSpacing: 10,
+                              spacing: AppSpacing.sm,
+                              runSpacing: AppSpacing.sm,
                               children: [
                                 for (final level in Level.values)
                                   AppChip(
@@ -87,10 +88,10 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                         ),
                       ),
                     ),
-                    const SizedBox(height: 12),
+                    const SizedBox(height: AppSpacing.md),
                     Card(
                       child: Padding(
-                        padding: const EdgeInsets.all(18),
+                        padding: const EdgeInsets.all(AppSpacing.xl),
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
@@ -100,8 +101,8 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                             ),
                             const SizedBox(height: 10),
                             Wrap(
-                              spacing: 10,
-                              runSpacing: 10,
+                              spacing: AppSpacing.sm,
+                              runSpacing: AppSpacing.sm,
                               children: [
                                 for (final goal in const [5, 10, 15])
                                   AppChip(
@@ -117,7 +118,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                         ),
                       ),
                     ),
-                    const SizedBox(height: 18),
+                    const SizedBox(height: AppSpacing.xl),
                     PrimaryButton(
                       label: 'Start LangRoutine',
                       icon: Icons.arrow_forward_rounded,
@@ -156,25 +157,21 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
 class _BrandMoment extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
     return Card(
       child: Padding(
-        padding: const EdgeInsets.all(22),
+        padding: const EdgeInsets.all(AppSpacing.xxl),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Container(
-              width: 42,
-              height: 42,
+              width: 44,
+              height: 44,
               decoration: BoxDecoration(
-                color: Theme.of(
-                  context,
-                ).colorScheme.primary.withValues(alpha: 0.12),
-                borderRadius: BorderRadius.circular(12),
+                color: scheme.secondaryContainer,
+                borderRadius: AppRadius.smAll,
               ),
-              child: Icon(
-                Icons.auto_stories_outlined,
-                color: Theme.of(context).colorScheme.primary,
-              ),
+              child: Icon(Icons.auto_stories_outlined, color: scheme.primary),
             ),
             const SizedBox(height: 14),
             Text(
@@ -185,7 +182,7 @@ class _BrandMoment extends StatelessWidget {
             Text(
               'A calm daily routine for reading, listening, and grammar.',
               style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                color: Theme.of(context).colorScheme.onSurfaceVariant,
+                color: scheme.onSurfaceVariant.withValues(alpha: 0.8),
               ),
             ),
           ],
