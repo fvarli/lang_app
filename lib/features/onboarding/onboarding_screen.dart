@@ -30,50 +30,34 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
       body: Stack(
         children: [
           Positioned(
-            top: -110,
-            right: -70,
-            child: Container(
-              width: 260,
-              height: 260,
-              decoration: BoxDecoration(
-                color: Theme.of(
-                  context,
-                ).colorScheme.primary.withValues(alpha: 0.08),
-                shape: BoxShape.circle,
-              ),
+            top: -120,
+            left: -60,
+            child: _GlowCircle(
+              size: 280,
+              color: Theme.of(
+                context,
+              ).colorScheme.primary.withValues(alpha: 0.12),
             ),
           ),
           Positioned(
             bottom: -140,
-            left: -80,
-            child: Container(
-              width: 280,
-              height: 280,
-              decoration: BoxDecoration(
-                color: Theme.of(
-                  context,
-                ).colorScheme.tertiary.withValues(alpha: 0.08),
-                shape: BoxShape.circle,
-              ),
+            right: -60,
+            child: _GlowCircle(
+              size: 320,
+              color: Theme.of(
+                context,
+              ).colorScheme.secondary.withValues(alpha: 0.1),
             ),
           ),
           SafeArea(
             child: Center(
               child: ConstrainedBox(
-                constraints: const BoxConstraints(maxWidth: 760),
+                constraints: const BoxConstraints(maxWidth: 780),
                 child: ListView(
                   padding: const EdgeInsets.all(24),
                   children: [
-                    Text(
-                      'Build your English routine',
-                      style: Theme.of(context).textTheme.displaySmall,
-                    ),
-                    const SizedBox(height: 10),
-                    Text(
-                      'Pick your starting level and daily practice target. You can update these in settings anytime.',
-                      style: Theme.of(context).textTheme.bodyLarge,
-                    ),
-                    const SizedBox(height: 24),
+                    _BrandMoment(),
+                    const SizedBox(height: 18),
                     Card(
                       child: Padding(
                         padding: const EdgeInsets.all(18),
@@ -81,10 +65,10 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
-                              'Choose your level',
+                              'Level',
                               style: Theme.of(context).textTheme.titleMedium,
                             ),
-                            const SizedBox(height: 12),
+                            const SizedBox(height: 10),
                             Wrap(
                               spacing: 10,
                               runSpacing: 10,
@@ -103,7 +87,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                         ),
                       ),
                     ),
-                    const SizedBox(height: 14),
+                    const SizedBox(height: 12),
                     Card(
                       child: Padding(
                         padding: const EdgeInsets.all(18),
@@ -114,7 +98,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                               'Daily goal',
                               style: Theme.of(context).textTheme.titleMedium,
                             ),
-                            const SizedBox(height: 12),
+                            const SizedBox(height: 10),
                             Wrap(
                               spacing: 10,
                               runSpacing: 10,
@@ -133,10 +117,10 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                         ),
                       ),
                     ),
-                    const SizedBox(height: 20),
+                    const SizedBox(height: 18),
                     PrimaryButton(
-                      label: 'Start Learning',
-                      icon: Icons.play_arrow_rounded,
+                      label: 'Start LangRoutine',
+                      icon: Icons.arrow_forward_rounded,
                       onPressed:
                           _selectedLevel == null ||
                               _dailyGoal == null ||
@@ -165,6 +149,64 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
           ),
         ],
       ),
+    );
+  }
+}
+
+class _BrandMoment extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return Card(
+      child: Padding(
+        padding: const EdgeInsets.all(22),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Container(
+              width: 42,
+              height: 42,
+              decoration: BoxDecoration(
+                color: Theme.of(
+                  context,
+                ).colorScheme.primary.withValues(alpha: 0.12),
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: Icon(
+                Icons.auto_stories_outlined,
+                color: Theme.of(context).colorScheme.primary,
+              ),
+            ),
+            const SizedBox(height: 14),
+            Text(
+              'LangRoutine',
+              style: Theme.of(context).textTheme.headlineMedium,
+            ),
+            const SizedBox(height: 6),
+            Text(
+              'A calm daily routine for reading, listening, and grammar.',
+              style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                color: Theme.of(context).colorScheme.onSurfaceVariant,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _GlowCircle extends StatelessWidget {
+  const _GlowCircle({required this.size, required this.color});
+
+  final double size;
+  final Color color;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: size,
+      height: size,
+      decoration: BoxDecoration(color: color, shape: BoxShape.circle),
     );
   }
 }

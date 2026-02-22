@@ -24,13 +24,19 @@ class _SettingsScreenState extends State<SettingsScreen> {
       body: ListView(
         padding: const EdgeInsets.all(16),
         children: [
+          Text('Preferences', style: Theme.of(context).textTheme.titleMedium),
+          const SizedBox(height: 8),
           Card(
             child: SwitchListTile(
               value: state.progress.darkMode,
               onChanged: (_) => state.toggleTheme(),
               title: const Text('Dark mode'),
+              subtitle: const Text('Switch between light and dark appearance.'),
             ),
           ),
+          const SizedBox(height: 12),
+          Text('Data', style: Theme.of(context).textTheme.titleMedium),
+          const SizedBox(height: 8),
           Card(
             child: ListTile(
               leading: const Icon(Icons.delete_outline),
@@ -41,6 +47,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
               onTap: () => state.resetProgress(),
             ),
           ),
+          const SizedBox(height: 12),
+          Text('About', style: Theme.of(context).textTheme.titleMedium),
+          const SizedBox(height: 8),
           Card(
             child: FutureBuilder<PackageInfo>(
               future: _packageInfoFuture,
@@ -53,8 +62,10 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   children: [
                     ListTile(
                       leading: const Icon(Icons.info_outline),
-                      title: const Text('About'),
-                      subtitle: Text('LangRoutine\n$versionText'),
+                      title: const Text('LangRoutine'),
+                      subtitle: Text(
+                        'Focus-first English routine\n$versionText',
+                      ),
                     ),
                     const Divider(height: 1),
                     ListTile(

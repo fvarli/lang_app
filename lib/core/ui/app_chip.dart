@@ -19,9 +19,13 @@ class AppChip extends StatelessWidget {
       selected: selected,
       onSelected: onSelected,
       showCheckmark: false,
+      materialTapTargetSize: MaterialTapTargetSize.padded,
+      visualDensity: const VisualDensity(horizontal: 0, vertical: 0),
       selectedColor: Theme.of(
         context,
-      ).colorScheme.primary.withValues(alpha: 0.15),
+      ).colorScheme.primary.withValues(alpha: 0.16),
+      backgroundColor: Theme.of(context).colorScheme.surface,
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
       side: BorderSide(
         color: selected
             ? Theme.of(context).colorScheme.primary

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../models/content_models.dart';
+import 'progress_bar.dart';
 
 class ModuleCard extends StatelessWidget {
   const ModuleCard({
@@ -31,7 +32,7 @@ class ModuleCard extends StatelessWidget {
         borderRadius: BorderRadius.circular(20),
         onTap: onTap,
         child: Padding(
-          padding: const EdgeInsets.all(18),
+          padding: const EdgeInsets.all(16),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -51,25 +52,30 @@ class ModuleCard extends StatelessWidget {
               const SizedBox(height: 10),
               Text(
                 module.description,
-                style: Theme.of(context).textTheme.bodyMedium,
-              ),
-              const SizedBox(height: 12),
-              Text(
-                '$completedCount/$totalCount completed',
-                style: Theme.of(context).textTheme.bodySmall,
-              ),
-              const SizedBox(height: 8),
-              ClipRRect(
-                borderRadius: BorderRadius.circular(999),
-                child: LinearProgressIndicator(
-                  value: totalCount == 0 ? 0 : completedCount / totalCount,
-                  minHeight: 8,
+                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                  color: Theme.of(context).colorScheme.onSurfaceVariant,
                 ),
               ),
-              const SizedBox(height: 6),
-              Text(
-                '$progressPercent% progress',
-                style: Theme.of(context).textTheme.bodySmall,
+              const SizedBox(height: 12),
+              Row(
+                children: [
+                  Text(
+                    '$completedCount/$totalCount completed',
+                    style: Theme.of(context).textTheme.bodySmall,
+                  ),
+                  const Spacer(),
+                  Text(
+                    '$progressPercent%',
+                    style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                      fontWeight: FontWeight.w700,
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 8),
+              ProgressBar(
+                value: totalCount == 0 ? 0 : completedCount / totalCount,
+                height: 8,
               ),
             ],
           ),

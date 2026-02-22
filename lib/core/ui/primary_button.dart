@@ -6,11 +6,13 @@ class PrimaryButton extends StatelessWidget {
     required this.label,
     required this.onPressed,
     this.icon,
+    this.compact = false,
   });
 
   final String label;
   final VoidCallback? onPressed;
   final IconData? icon;
+  final bool compact;
 
   @override
   Widget build(BuildContext context) {
@@ -27,7 +29,13 @@ class PrimaryButton extends StatelessWidget {
 
     return FilledButton(
       onPressed: onPressed,
-      style: FilledButton.styleFrom(minimumSize: const Size.fromHeight(56)),
+      style: FilledButton.styleFrom(
+        minimumSize: Size.fromHeight(compact ? 46 : 56),
+        padding: EdgeInsets.symmetric(
+          horizontal: compact ? 14 : 18,
+          vertical: compact ? 10 : 14,
+        ),
+      ),
       child: child,
     );
   }
