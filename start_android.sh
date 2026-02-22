@@ -8,6 +8,8 @@ set -euo pipefail
 # Usage:
 #   ./start_android.sh
 #   AVD=Medium_Phone_API_36.1 ./start_android.sh
+#   INSTALL_RELEASE=1 ./start_android.sh
+#   INSTALL_RELEASE=1 SKIP_RUN=1 ./start_android.sh
 #   SKIP_TESTS=1 ./start_android.sh
 #   SKIP_ANALYZE=1 ./start_android.sh
 #   SKIP_FORMAT=1 ./start_android.sh
@@ -15,7 +17,7 @@ set -euo pipefail
 #
 # Notes:
 # - Starts (or reuses) an Android emulator, then runs pub get/format/analyze/test/run.
-# - Forces running on an Android device (emulator preferred).
+# - If INSTALL_RELEASE=1 and a physical device is connected, builds release APK and installs it.
 
 log() { printf "✅ %s\n" "$*" >&2; }
 warn() { printf "⚠️ %s\n" "$*" >&2; }
@@ -35,6 +37,11 @@ SKIP_TESTS="${SKIP_TESTS:-0}"
 SKIP_ANALYZE="${SKIP_ANALYZE:-0}"
 SKIP_FORMAT="${SKIP_FORMAT:-0}"
 CLEAN="${CLEAN:-0}"
+
+INSTALL_RELEASE="${INSTALL_RELEASE:-0}"   # if 1: build+install release APK to physical device (if present)
+SKIP_RUN="${SKIP_RUN:-0}"                 # if 1: don't flutter run at the end
+
+APK_PATH="${APK_PATH:-build/app/outputs/flutter-apk/app-release.apk}"
 
 # ---- Helpers ----
 require_cmd() { command -v "$1" >/dev/null 2>&1 || die "Command not found: $1"; }
@@ -58,6 +65,30 @@ get_first_android_device_id() {
     return 0
   fi
   return 1
+}
+
+get_first_physical_device_id() {
+  "$ADB_BIN" devices | awk 'NR>1 && $1 !~ /^emulator-/ && $2=="device"{print $1; exit 0}'
+}
+
+install_release_if_physical_device() {
+  local target
+  target="$(get_first_physical_device_id || true)"
+  if [ -z "${target:-}" ]; then
+    warn "No physical Android device detected. Skipping release install."
+    return 0
+  fi
+
+  log "Physical device detected: $target"
+  log "Building: flutter build apk --release"
+  flutter build apk --release
+
+  [ -f "$APK_PATH" ] || die "Release APK not found at: $APK_PATH"
+
+  log "Installing release APK on $target"
+  "$ADB_BIN" -s "$target" install -r "$APK_PATH"
+
+  log "Installed: $APK_PATH"
 }
 
 wait_for_boot() {
@@ -102,14 +133,13 @@ start_emulator_if_needed() {
   fi
   [ -n "$AVD_NAME" ] || die "No AVD found. Create one in Android Studio → Device Manager."
 
-  log "Starting emulator: $AVD_NAME"
-# --- Emulator runtime flags (can override with EMU_FLAGS env) ---
-EMU_FLAGS_DEFAULT="-netdelay none -netspeed full -no-snapshot -no-boot-anim -cores 4"
-EMU_FLAGS="${EMU_FLAGS:-$EMU_FLAGS_DEFAULT}"
+  # --- Emulator runtime flags (can override with EMU_FLAGS env) ---
+  EMU_FLAGS_DEFAULT="-netdelay none -netspeed full -no-snapshot -no-boot-anim -cores 4"
+  EMU_FLAGS="${EMU_FLAGS:-$EMU_FLAGS_DEFAULT}"
 
-log "Starting emulator: $AVD_NAME"
-# shellcheck disable=SC2086
-"$EMULATOR_BIN" -avd "$AVD_NAME" $EMU_FLAGS >/tmp/emulator.log 2>&1 &
+  log "Starting emulator: $AVD_NAME"
+  # shellcheck disable=SC2086
+  "$EMULATOR_BIN" -avd "$AVD_NAME" $EMU_FLAGS >/tmp/emulator.log 2>&1 &
 
   log "Waiting for emulator device..."
   "$ADB_BIN" wait-for-device
@@ -141,7 +171,7 @@ fi
 require_exec "$ADB_BIN"
 require_exec "$EMULATOR_BIN"
 
-# Start or reuse emulator
+# Start or reuse emulator (so flutter run always has a target)
 _="$(start_emulator_if_needed)" >/dev/null
 
 # Pick Android target id (emulator preferred)
@@ -178,6 +208,15 @@ else
   warn "Skipping tests (SKIP_TESTS=1)"
 fi
 
-# Run on Android target
+# Optional: build+install release APK to physical device if present
+if [ "$INSTALL_RELEASE" = "1" ]; then
+  install_release_if_physical_device
+fi
+
+if [ "$SKIP_RUN" = "1" ]; then
+  warn "Skipping flutter run (SKIP_RUN=1)"
+  exit 0
+fi
+
 log "Running: flutter run -d $ANDROID_TARGET"
 flutter run -d "$ANDROID_TARGET"
