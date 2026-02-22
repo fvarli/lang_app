@@ -24,6 +24,8 @@ class AppState extends ChangeNotifier {
   ThemeMode get themeMode =>
       progress.darkMode ? ThemeMode.dark : ThemeMode.light;
 
+  bool get hasCompletedOnboarding => progress.onboardingCompleted;
+
   Future<void> bootstrap() async {
     content = await _contentRepository.loadContent();
     progress = await _progressStore.read();
@@ -48,6 +50,7 @@ class AppState extends ChangeNotifier {
     progress = progress.copyWith(
       selectedLevel: level,
       dailyGoalMinutes: dailyGoalMinutes,
+      onboardingCompleted: true,
     );
     await _progressStore.write(progress);
     notifyListeners();

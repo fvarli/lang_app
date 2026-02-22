@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
+import '../core/state/app_state.dart';
 import '../features/home/home_screen.dart';
 import '../features/lesson/lesson_screen.dart';
 import '../features/module_list/module_list_screen.dart';
@@ -17,9 +18,23 @@ class AppRoutes {
   static const settings = '/settings';
 }
 
-GoRouter buildRouter() {
+GoRouter buildRouter(AppState appState) {
   return GoRouter(
     initialLocation: AppRoutes.onboarding,
+    refreshListenable: appState,
+    redirect: (context, state) {
+      if (!appState.isReady) {
+        return null;
+      }
+      final onOnboarding = state.uri.path == AppRoutes.onboarding;
+      if (!appState.hasCompletedOnboarding && !onOnboarding) {
+        return AppRoutes.onboarding;
+      }
+      if (appState.hasCompletedOnboarding && onOnboarding) {
+        return AppRoutes.home;
+      }
+      return null;
+    },
     routes: [
       GoRoute(
         path: AppRoutes.onboarding,

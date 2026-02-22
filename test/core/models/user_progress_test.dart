@@ -13,12 +13,14 @@ void main() {
 
     expect(progress.completedLessonsToday, 0);
     expect(progress.completedOnDate, isNull);
+    expect(progress.onboardingCompleted, isFalse);
   });
 
   test('UserProgress serializes daily fields', () {
     const progress = UserProgress(
       selectedLevel: Level.a1,
       dailyGoalMinutes: 10,
+      onboardingCompleted: true,
       completedLessonsToday: 4,
       completedOnDate: '2026-02-21',
       streak: 3,
@@ -30,12 +32,14 @@ void main() {
 
     expect(json['completedLessonsToday'], 4);
     expect(json['completedOnDate'], '2026-02-21');
+    expect(json['onboardingCompleted'], isTrue);
   });
 
   test('todayProgressRatio is clamped to 0..1', () {
     const progress = UserProgress(
       selectedLevel: Level.a1,
       dailyGoalMinutes: 10,
+      onboardingCompleted: false,
       completedLessonsToday: 20,
       completedOnDate: '2026-02-21',
       streak: 0,

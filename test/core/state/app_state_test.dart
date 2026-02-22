@@ -71,6 +71,7 @@ void main() {
       const UserProgress(
         selectedLevel: Level.a1,
         dailyGoalMinutes: 10,
+        onboardingCompleted: true,
         completedLessonsToday: 2,
         completedOnDate: '2026-02-21',
         streak: 0,
@@ -101,6 +102,7 @@ void main() {
       const UserProgress(
         selectedLevel: Level.a1,
         dailyGoalMinutes: 10,
+        onboardingCompleted: true,
         completedLessonsToday: 5,
         completedOnDate: '2026-02-20',
         streak: 0,
@@ -127,6 +129,7 @@ void main() {
       const UserProgress(
         selectedLevel: Level.a1,
         dailyGoalMinutes: 10,
+        onboardingCompleted: true,
         completedLessonsToday: 4,
         completedOnDate: '2026-02-20',
         streak: 0,
@@ -145,5 +148,37 @@ void main() {
 
     expect(appState.progress.completedLessonsToday, 0);
     expect(appState.progress.completedOnDate, '2026-02-21');
+  });
+
+  test('saveOnboarding persists level, goal, and completion flag', () async {
+    final store = _FakeProgressStore(UserProgress.empty());
+    final appState = AppState(
+      contentRepository: _FakeContentRepository(_bundle()),
+      progressStore: store,
+      nowProvider: () => DateTime(2026, 2, 21),
+    );
+
+    await appState.bootstrap();
+    await appState.saveOnboarding(level: Level.b1, dailyGoalMinutes: 15);
+
+    expect(appState.progress.selectedLevel, Level.b1);
+    expect(appState.progress.dailyGoalMinutes, 15);
+    expect(appState.progress.onboardingCompleted, isTrue);
+    expect(store.current.onboardingCompleted, isTrue);
+  });
+
+  test('completeLesson persists completed ids for subsequent reads', () async {
+    final store = _FakeProgressStore(UserProgress.empty());
+    final appState = AppState(
+      contentRepository: _FakeContentRepository(_bundle()),
+      progressStore: store,
+      nowProvider: () => DateTime(2026, 2, 21),
+    );
+
+    await appState.bootstrap();
+    await appState.completeLesson('reading_a1_1');
+
+    final reloaded = await store.read();
+    expect(reloaded.completedLessonIds.contains('reading_a1_1'), isTrue);
   });
 }

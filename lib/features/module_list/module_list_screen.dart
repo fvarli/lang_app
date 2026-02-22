@@ -19,11 +19,15 @@ class ModuleListScreen extends StatelessWidget {
       return const Scaffold(body: Center(child: CircularProgressIndicator()));
     }
 
-    final selectedModule = content.modules.where((m) => m.id == moduleId).first;
-    final moduleType = ModuleType.values.firstWhere((m) => m.name == moduleId);
-    final lessons = content.lessonsForLevelAndModule(
+    final selectedModule = content.moduleById(moduleId);
+    if (selectedModule == null) {
+      return const Scaffold(
+        body: Center(child: Text('Module not found for this route.')),
+      );
+    }
+    final lessons = content.lessonsForLevelAndModuleId(
       level: state.progress.selectedLevel,
-      module: moduleType,
+      moduleId: moduleId,
     );
 
     return Scaffold(

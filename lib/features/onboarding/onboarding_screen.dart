@@ -13,8 +13,8 @@ class OnboardingScreen extends StatefulWidget {
 }
 
 class _OnboardingScreenState extends State<OnboardingScreen> {
-  Level _selectedLevel = Level.a1;
-  int _dailyGoal = 10;
+  Level? _selectedLevel;
+  int? _dailyGoal;
 
   @override
   Widget build(BuildContext context) {
@@ -95,16 +95,26 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                   ),
                   const SizedBox(height: 18),
                   FilledButton(
-                    onPressed: () async {
-                      await state.saveOnboarding(
-                        level: _selectedLevel,
-                        dailyGoalMinutes: _dailyGoal,
-                      );
-                      if (!context.mounted) {
-                        return;
-                      }
-                      context.go(AppRoutes.home);
-                    },
+                    onPressed:
+                        _selectedLevel == null ||
+                            _dailyGoal == null ||
+                            !const {5, 10, 15}.contains(_dailyGoal)
+                        ? null
+                        : () async {
+                            final level = _selectedLevel;
+                            final dailyGoal = _dailyGoal;
+                            if (level == null || dailyGoal == null) {
+                              return;
+                            }
+                            await state.saveOnboarding(
+                              level: level,
+                              dailyGoalMinutes: dailyGoal,
+                            );
+                            if (!context.mounted) {
+                              return;
+                            }
+                            context.go(AppRoutes.home);
+                          },
                     style: FilledButton.styleFrom(
                       minimumSize: const Size.fromHeight(56),
                     ),

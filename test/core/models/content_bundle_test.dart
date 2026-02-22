@@ -226,4 +226,73 @@ void main() {
       throwsA(isA<ContentValidationException>()),
     );
   });
+
+  test('ContentBundle resolves lessons by module id through one helper', () {
+    const raw = '''
+    {
+      "schemaVersion": 1,
+      "levels": ["a1", "a2", "b1", "b2", "c1", "c2"],
+      "modules": [
+        {"id": "reading", "type": "reading", "title": "Reading", "description": "desc"},
+        {"id": "grammar", "type": "grammar", "title": "Grammar", "description": "desc"}
+      ],
+      "units": [],
+      "lessons": [
+        {
+          "id": "reading_a1_1",
+          "module": "reading",
+          "level": "a1",
+          "title": "R1",
+          "passageText": "Text",
+          "questions": [{"id": "q1", "type": "mcq", "prompt": "Prompt", "options": ["A", "B"], "correctIndex": 0}]
+        },
+        {
+          "id": "grammar_a1_1",
+          "module": "grammar",
+          "level": "a1",
+          "title": "G1",
+          "explanationMarkdown": "x",
+          "examples": ["e1"],
+          "questions": [{"id": "q2", "type": "mcq", "prompt": "Prompt", "options": ["A", "B"], "correctIndex": 0}]
+        }
+      ]
+    }
+    ''';
+
+    final bundle = ContentBundle.fromJson(
+      jsonDecode(raw) as Map<String, dynamic>,
+    );
+    final lessons = bundle.lessonsForLevelAndModuleId(
+      level: Level.a1,
+      moduleId: 'grammar',
+    );
+
+    expect(lessons, hasLength(1));
+    expect(lessons.first.id, 'grammar_a1_1');
+  });
+
+  test('ContentBundle fails when module id and type differ', () {
+    const raw = '''
+    {
+      "schemaVersion": 1,
+      "levels": ["a1", "a2", "b1", "b2", "c1", "c2"],
+      "modules": [
+        {"id": "reading_custom", "type": "reading", "title": "Reading", "description": "desc"}
+      ],
+      "units": [],
+      "lessons": []
+    }
+    ''';
+
+    expect(
+      () => ContentBundle.fromJson(jsonDecode(raw) as Map<String, dynamic>),
+      throwsA(
+        isA<ContentValidationException>().having(
+          (e) => e.message,
+          'message',
+          contains('must match type'),
+        ),
+      ),
+    );
+  });
 }

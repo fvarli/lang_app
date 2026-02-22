@@ -240,6 +240,11 @@ class ContentBundle {
       if (!moduleIdSet.add(module.id)) {
         throw ContentValidationException('Duplicate module id "${module.id}"');
       }
+      if (module.id != module.type.name) {
+        throw ContentValidationException(
+          'Module "${module.id}" must match type "${module.type.name}"',
+        );
+      }
       parsedModules.add(module);
     }
 
@@ -351,12 +356,38 @@ class ContentBundle {
         .where((lesson) => lesson.module == module && lesson.level == level)
         .toList(growable: false);
   }
+
+  Module? moduleById(String moduleId) {
+    for (final module in modules) {
+      if (module.id == moduleId) {
+        return module;
+      }
+    }
+    return null;
+  }
+
+  ModuleType? moduleTypeById(String moduleId) {
+    final module = moduleById(moduleId);
+    return module?.type;
+  }
+
+  List<Lesson> lessonsForLevelAndModuleId({
+    required Level level,
+    required String moduleId,
+  }) {
+    final moduleType = moduleTypeById(moduleId);
+    if (moduleType == null) {
+      return const <Lesson>[];
+    }
+    return lessonsForLevelAndModule(level: level, module: moduleType);
+  }
 }
 
 class UserProgress {
   const UserProgress({
     required this.selectedLevel,
     required this.dailyGoalMinutes,
+    required this.onboardingCompleted,
     required this.completedLessonsToday,
     required this.completedOnDate,
     required this.streak,
@@ -366,6 +397,7 @@ class UserProgress {
 
   final Level selectedLevel;
   final int dailyGoalMinutes;
+  final bool onboardingCompleted;
   final int completedLessonsToday;
   final String? completedOnDate;
   final int streak;
@@ -389,6 +421,7 @@ class UserProgress {
   UserProgress copyWith({
     Level? selectedLevel,
     int? dailyGoalMinutes,
+    bool? onboardingCompleted,
     int? completedLessonsToday,
     String? completedOnDate,
     int? streak,
@@ -398,6 +431,7 @@ class UserProgress {
     return UserProgress(
       selectedLevel: selectedLevel ?? this.selectedLevel,
       dailyGoalMinutes: dailyGoalMinutes ?? this.dailyGoalMinutes,
+      onboardingCompleted: onboardingCompleted ?? this.onboardingCompleted,
       completedLessonsToday:
           completedLessonsToday ?? this.completedLessonsToday,
       completedOnDate: completedOnDate ?? this.completedOnDate,
@@ -411,6 +445,7 @@ class UserProgress {
     return {
       'selectedLevel': selectedLevel.name,
       'dailyGoalMinutes': dailyGoalMinutes,
+      'onboardingCompleted': onboardingCompleted,
       'completedLessonsToday': completedLessonsToday,
       'completedOnDate': completedOnDate,
       'streak': streak,
@@ -426,6 +461,7 @@ class UserProgress {
         'userProgress.selectedLevel',
       ),
       dailyGoalMinutes: _requireInt(json, 'dailyGoalMinutes', 'userProgress'),
+      onboardingCompleted: json['onboardingCompleted'] as bool? ?? false,
       completedLessonsToday: json['completedLessonsToday'] as int? ?? 0,
       completedOnDate: json['completedOnDate'] as String?,
       streak: _requireInt(json, 'streak', 'userProgress'),
@@ -440,6 +476,7 @@ class UserProgress {
     return const UserProgress(
       selectedLevel: Level.a1,
       dailyGoalMinutes: 5,
+      onboardingCompleted: false,
       completedLessonsToday: 0,
       completedOnDate: null,
       streak: 0,

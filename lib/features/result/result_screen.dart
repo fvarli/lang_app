@@ -25,59 +25,66 @@ class ResultScreen extends StatelessWidget {
       currentLessonId: lessonId,
     );
 
-    return Scaffold(
-      body: SafeArea(
-        child: Center(
-          child: ConstrainedBox(
-            constraints: const BoxConstraints(maxWidth: 580),
-            child: Padding(
-              padding: const EdgeInsets.all(24),
-              child: Card(
-                child: Padding(
-                  padding: const EdgeInsets.all(24),
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Text(
-                        'Lesson Complete',
-                        style: Theme.of(context).textTheme.titleLarge,
-                      ),
-                      const SizedBox(height: 12),
-                      Text(
-                        '$score / $total',
-                        style: Theme.of(context).textTheme.headlineMedium,
-                      ),
-                      const SizedBox(height: 4),
-                      Text('$pct% accuracy'),
-                      const SizedBox(height: 18),
-                      FilledButton(
-                        onPressed: () {
-                          if (module == null || module.isEmpty) {
-                            context.go(AppRoutes.home);
-                            return;
-                          }
-                          context.go('${AppRoutes.moduleList}?module=$module');
-                        },
-                        child: const Text('Back to Module'),
-                      ),
-                      const SizedBox(height: 8),
-                      OutlinedButton(
-                        onPressed: () {
-                          if (module == null || module.isEmpty) {
-                            context.go(AppRoutes.home);
-                            return;
-                          }
-                          if (nextLessonId != null) {
-                            context.go(
-                              '${AppRoutes.lesson}?lesson=$nextLessonId',
+    return PopScope(
+      canPop: false,
+      onPopInvokedWithResult: (didPop, result) {
+        if (didPop) {
+          return;
+        }
+        _goToModuleOrHome(context: context, moduleId: module);
+      },
+      child: Scaffold(
+        body: SafeArea(
+          child: Center(
+            child: ConstrainedBox(
+              constraints: const BoxConstraints(maxWidth: 580),
+              child: Padding(
+                padding: const EdgeInsets.all(24),
+                child: Card(
+                  child: Padding(
+                    padding: const EdgeInsets.all(24),
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Text(
+                          'Lesson Complete',
+                          style: Theme.of(context).textTheme.titleLarge,
+                        ),
+                        const SizedBox(height: 12),
+                        Text(
+                          '$score / $total',
+                          style: Theme.of(context).textTheme.headlineMedium,
+                        ),
+                        const SizedBox(height: 4),
+                        Text('$pct% accuracy'),
+                        const SizedBox(height: 18),
+                        FilledButton(
+                          onPressed: () {
+                            _goToModuleOrHome(
+                              context: context,
+                              moduleId: module,
                             );
-                            return;
-                          }
-                          context.go('${AppRoutes.moduleList}?module=$module');
-                        },
-                        child: const Text('Continue'),
-                      ),
-                    ],
+                          },
+                          child: const Text('Back to Module'),
+                        ),
+                        const SizedBox(height: 8),
+                        OutlinedButton(
+                          onPressed: () {
+                            if (nextLessonId != null) {
+                              context.go(
+                                '${AppRoutes.lesson}?lesson=$nextLessonId',
+                              );
+                              return;
+                            }
+                            _goToModuleOrHome(
+                              context: context,
+                              moduleId: module,
+                            );
+                          },
+                          child: const Text('Continue'),
+                        ),
+                      ],
+                    ),
                   ),
                 ),
               ),
@@ -103,6 +110,17 @@ class ResultScreen extends StatelessWidget {
   }
 }
 
+void _goToModuleOrHome({
+  required BuildContext context,
+  required String? moduleId,
+}) {
+  if (moduleId == null || moduleId.isEmpty) {
+    context.go(AppRoutes.home);
+    return;
+  }
+  context.go('${AppRoutes.moduleList}?module=$moduleId');
+}
+
 String? nextLessonIdForModule({
   required ContentBundle? content,
   required Level level,
@@ -117,20 +135,9 @@ String? nextLessonIdForModule({
     return null;
   }
 
-  ModuleType? moduleType;
-  for (final candidate in ModuleType.values) {
-    if (candidate.name == moduleId) {
-      moduleType = candidate;
-      break;
-    }
-  }
-  if (moduleType == null) {
-    return null;
-  }
-
-  final lessons = content.lessonsForLevelAndModule(
+  final lessons = content.lessonsForLevelAndModuleId(
     level: level,
-    module: moduleType,
+    moduleId: moduleId,
   );
 
   for (var i = 0; i < lessons.length; i++) {
