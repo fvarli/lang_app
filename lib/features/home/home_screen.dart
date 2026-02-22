@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../app/router.dart';
-import '../../core/models/content_models.dart';
 import '../../core/state/app_state_scope.dart';
+import '../../core/ui/module_card.dart';
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
@@ -20,7 +20,7 @@ class HomeScreen extends StatelessWidget {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Learn Daily'),
+        title: const Text('Focus Board'),
         actions: [
           IconButton(
             onPressed: () => context.push(AppRoutes.settings),
@@ -35,25 +35,39 @@ class HomeScreen extends StatelessWidget {
           return ListView(
             padding: const EdgeInsets.all(20),
             children: [
+              Text(
+                'Welcome back',
+                style: Theme.of(context).textTheme.headlineMedium,
+              ),
+              const SizedBox(height: 6),
+              Text(
+                'Your daily progress and lesson modules',
+                style: Theme.of(context).textTheme.bodyLarge,
+              ),
+              const SizedBox(height: 14),
               Card(
                 child: Padding(
-                  padding: const EdgeInsets.all(16),
-                  child: Wrap(
-                    spacing: 16,
-                    runSpacing: 8,
+                  padding: const EdgeInsets.all(18),
+                  child: Row(
                     children: [
-                      _StatTile(
-                        label: 'Level',
-                        value: appState.progress.selectedLevel.name
-                            .toUpperCase(),
+                      Expanded(
+                        child: _StatTile(
+                          label: 'Level',
+                          value: appState.progress.selectedLevel.name
+                              .toUpperCase(),
+                        ),
                       ),
-                      _StatTile(
-                        label: 'Daily Goal',
-                        value: '${appState.progress.dailyGoalMinutes} min',
+                      Expanded(
+                        child: _StatTile(
+                          label: 'Goal',
+                          value: '${appState.progress.dailyGoalMinutes} min',
+                        ),
                       ),
-                      _StatTile(
-                        label: 'Streak',
-                        value: '${appState.progress.streak} day',
+                      Expanded(
+                        child: _StatTile(
+                          label: 'Streak',
+                          value: '${appState.progress.streak} day',
+                        ),
                       ),
                     ],
                   ),
@@ -62,7 +76,7 @@ class HomeScreen extends StatelessWidget {
               const SizedBox(height: 12),
               Card(
                 child: Padding(
-                  padding: const EdgeInsets.all(16),
+                  padding: const EdgeInsets.all(18),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
@@ -71,10 +85,12 @@ class HomeScreen extends StatelessWidget {
                         style: Theme.of(context).textTheme.titleMedium,
                       ),
                       const SizedBox(height: 10),
-                      LinearProgressIndicator(
-                        value: appState.progress.todayProgressRatio,
-                        minHeight: 10,
+                      ClipRRect(
                         borderRadius: BorderRadius.circular(999),
+                        child: LinearProgressIndicator(
+                          value: appState.progress.todayProgressRatio,
+                          minHeight: 10,
+                        ),
                       ),
                     ],
                   ),
@@ -93,76 +109,36 @@ class HomeScreen extends StatelessWidget {
                 ),
                 itemBuilder: (context, index) {
                   final module = modules[index];
-                  return _ModuleCard(module: module);
+                  final lessons = appState.content!.lessonsForLevelAndModule(
+                    level: appState.progress.selectedLevel,
+                    module: module.type,
+                  );
+                  final completed = lessons
+                      .where(
+                        (lesson) => appState.progress.completedLessonIds
+                            .contains(lesson.id),
+                      )
+                      .length;
+                  final percent = lessons.isEmpty
+                      ? 0
+                      : ((completed / lessons.length) * 100).round();
+
+                  return ModuleCard(
+                    module: module,
+                    completedCount: completed,
+                    totalCount: lessons.length,
+                    progressPercent: percent,
+                    onTap: () {
+                      context.push(
+                        '${AppRoutes.moduleList}?module=${module.id}',
+                      );
+                    },
+                  );
                 },
               ),
             ],
           );
         },
-      ),
-    );
-  }
-}
-
-class _ModuleCard extends StatelessWidget {
-  const _ModuleCard({required this.module});
-
-  final Module module;
-
-  @override
-  Widget build(BuildContext context) {
-    final state = AppStateScope.of(context);
-    final icon = switch (module.type) {
-      ModuleType.reading => Icons.menu_book_outlined,
-      ModuleType.listening => Icons.headphones_outlined,
-      ModuleType.grammar => Icons.spellcheck_outlined,
-    };
-    final lessons = state.content!.lessonsForLevelAndModule(
-      level: state.progress.selectedLevel,
-      module: module.type,
-    );
-    final completed = lessons
-        .where(
-          (lesson) => state.progress.completedLessonIds.contains(lesson.id),
-        )
-        .length;
-    final percent = lessons.isEmpty
-        ? 0
-        : ((completed / lessons.length) * 100).round();
-
-    return Card(
-      child: InkWell(
-        borderRadius: BorderRadius.circular(20),
-        onTap: () {
-          context.push('${AppRoutes.moduleList}?module=${module.id}');
-        },
-        child: Padding(
-          padding: const EdgeInsets.all(18),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Icon(icon, size: 28),
-              const SizedBox(height: 12),
-              Text(module.title, style: Theme.of(context).textTheme.titleLarge),
-              const SizedBox(height: 8),
-              Text(module.description),
-              const SizedBox(height: 8),
-              Text(
-                '$completed/${lessons.length} completed',
-                style: Theme.of(context).textTheme.bodySmall,
-              ),
-              Text(
-                '$percent% progress',
-                style: Theme.of(context).textTheme.bodySmall,
-              ),
-              const Spacer(),
-              const Align(
-                alignment: Alignment.bottomRight,
-                child: Icon(Icons.arrow_forward_rounded),
-              ),
-            ],
-          ),
-        ),
       ),
     );
   }
@@ -176,11 +152,18 @@ class _StatTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Row(
-      mainAxisSize: MainAxisSize.min,
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text('$label: ', style: const TextStyle(fontWeight: FontWeight.w600)),
-        Text(value),
+        Text(
+          label.toUpperCase(),
+          style: Theme.of(context).textTheme.bodySmall?.copyWith(
+            fontWeight: FontWeight.w700,
+            color: Theme.of(context).colorScheme.onSurfaceVariant,
+          ),
+        ),
+        const SizedBox(height: 4),
+        Text(value, style: Theme.of(context).textTheme.titleMedium),
       ],
     );
   }
